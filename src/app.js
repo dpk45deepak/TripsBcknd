@@ -63,7 +63,7 @@ const dynamicLimiter = (req, res, next) => {
 
 // Static files and views
 app.use(express.static(path.join(__dirname, 'public')));
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, "..", 'views'));
 app.set('view engine', 'ejs');
 
 // common middleware.
@@ -74,6 +74,10 @@ app.use(express.static("public"));
 // Default Routes
 app.get('/', (req, res) => {
   res.render('index');
+});
+
+app.get('/docs', (req, res) => {
+  res.render('docs');
 });
 
 // random route
