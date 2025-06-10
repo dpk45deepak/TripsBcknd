@@ -25,14 +25,21 @@ A smart travel backend built with **Node.js + Express** that combines **geolocat
 
 ## 📁 Folder Structure
 
-```
+---
 .
-├── views/              # EJS views for testing
-├── public/             # Static files
-├── DomesticTrip.json   # Sample preference file (domestic)
-├── ForeignTrip.json    # Sample preference file (foreign)
-├── index.js            # Main server file
-```
+├── views/                  # EJS views for testing (index.ejs, docs.ejs)
+├── public/                 # Static files (CSS, JS, images)
+├── src/
+│   ├── controllers/        # Route controllers (e.g., trips.controller.js)
+│   ├── models/             # Mongoose models (e.g., trips.models.js)
+│   ├── routes/             # Express route files
+│   ├── DBConfig/           # Database config (e.g., DBconfig.js)
+│   └── app.js              # Express app setup
+├── DomesticTrip.json       # Sample preference file (domestic)
+├── ForeignTrip.json        # Sample preference file (foreign)
+├── index.js                # Main server file (entry point)
+├── package.json
+└── README.md
 
 ---
 
@@ -66,21 +73,11 @@ A smart travel backend built with **Node.js + Express** that combines **geolocat
 git clone https://github.com/your-username/travel-assistant-api.git
 cd travel-assistant-api
 npm install
-node index.js
+npm run dev
 ```
 
 Server will run on: `http://localhost:4041`
 
----
-
-## 🌐 Deployed API
-
-> 🔗 [Live on Render](https://api-adfs.onrender.com)
-
-Try:  
-`https://api-adfs.onrender.com/location-info?city=delhi&state=delhi`
-
----
 
 ## 📦 Dependencies
 
@@ -93,18 +90,6 @@ Try:
 - fs (Node.js built-in)
 - path (Node.js built-in)
 
----
-
-## 🧾 APIs Used
-
-| API                                | Purpose                     | Free Tier? |
-|-----------------------------------|-----------------------------|------------|
-| [Open-Meteo](https://open-meteo.com)        | Weather + Geocoding         | ✅ Yes      |
-| [OpenStreetMap Nominatim](https://nominatim.openstreetmap.org/) | Facility Search              | ✅ Yes      |
-
-✅ All APIs used are free, no keys required, and suitable for personal or academic use.
-
----
 
 ## 📄 License
 
@@ -115,7 +100,7 @@ This project is open for educational and personal use. Please credit the public 
 ## 🙋‍♂️ Author
 
 **Deepak Kumar**  
-🚀 B.Tech CSE | Backend Developer | Travel Tech Enthusiast  
+🚀 B.Tech CSE | Backend Developer and ML engineer
 📧 `dpk.41deep@gmail.com`
 
 ---
