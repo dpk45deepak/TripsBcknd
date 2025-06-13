@@ -33,6 +33,31 @@
         .feature-list li {
             margin-bottom: 8px;
         }
+
+        /* New styles for documentation tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        pre {
+            background-color: #f8f9fa;
+            padding: 8px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
     </style>
 </head>
 
@@ -94,6 +119,92 @@
                 </div>
             </div>
         </div>
+        <!-- User Authentication & Profile API Documentation -->
+        <section>
+            <h2>User Authentication & Profile API</h2>
+            <table border="1" cellpadding="6" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Endpoint</th>
+                        <th>Protected?</th>
+                        <th>Description</th>
+                        <th>Body/Headers</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>POST</td>
+                        <td>/user/register</td>
+                        <td>No</td>
+                        <td>Register a new user</td>
+                        <td>
+                            <pre>
+{
+  "username": "yourname",
+  "email": "your@email.com",
+  "password": "yourpassword"
+}
+                            </pre>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>POST</td>
+                        <td>/user/login</td>
+                        <td>No</td>
+                        <td>Login and receive JWT tokens</td>
+                        <td>
+                            <pre>
+{
+  "email": "your@email.com",
+  "password": "yourpassword"
+}
+                            </pre>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>GET</td>
+                        <td>/user/profile</td>
+                        <td>Yes</td>
+                        <td>Get the authenticated user's profile</td>
+                        <td>
+                            <b>Headers:</b>
+                            <pre>
+Authorization: Bearer &lt;access_token&gt;
+                            </pre>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>POST</td>
+                        <td>/user/logout</td>
+                        <td>Yes</td>
+                        <td>Logout user (client should delete token)</td>
+                        <td>
+                            <b>Headers:</b>
+                            <pre>
+Authorization: Bearer &lt;access_token&gt;
+                            </pre>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>POST</td>
+                        <td>/user/refresh-token</td>
+                        <td>No</td>
+                        <td>Get a new access token using a refresh token</td>
+                        <td>
+                            <pre>
+{
+  "refreshToken": "&lt;refresh_token&gt;"
+}
+                            </pre>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>
+                <b>Note:</b> All protected routes require a valid JWT access token in the <code>Authorization</code> header.
+            </p>
+        </section>
         <footer class="mt-5 text-center text-muted">
             &copy; <%= new Date().getFullYear() %> Travel Assistant API &mdash; Powered by Node.js & Express<br>
                 Deepak Kumar | <a href="mailto:dpk.41deep@gmail.com">dpk.41deep@gmail.com</a>

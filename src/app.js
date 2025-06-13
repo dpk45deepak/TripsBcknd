@@ -8,6 +8,8 @@ import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import userRouter from './routes/user.routes.js'
 import tripRouter from './routes/trips.routes.js'
+import cookieParser from 'cookie-parser';
+
 
 dotenv.config();
 
@@ -51,7 +53,7 @@ app.use(morgan('dev'));
 const dynamicLimiter = (req, res, next) => {
   const origin = req.headers.origin || '';
   const isUnlimitedOrigin = origin === allowedUnlimitedOrigin || origin.startsWith(allowedUnlimitedOrigin);
-
+  
   if (isUnlimitedOrigin) {
     next(); // skip rate limiting
   }
@@ -70,6 +72,7 @@ app.set('view engine', 'ejs');
 app.use(express.json({limit: "16kb"}));
 app.use(express.urlencoded({ extended: true, limit: "16kb"}));
 app.use(express.static("public"));
+app.use(cookieParser());
 
 // Default Routes
 app.get('/', (req, res) => {
