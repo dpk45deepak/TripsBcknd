@@ -26,21 +26,19 @@ A smart travel backend built with **Node.js + Express** that combines **geolocat
 ## 📁 Folder Structure
 
 ---
-
-├── views/                  # EJS views for testing (index.ejs, docs.ejs)
-├── public/                 # Static files (CSS, JS, images)
+├── views/ # EJS templates for UI rendering (index.ejs, docs.ejs)
+├── public/ # Static assets like CSS, JS, and images
 ├── src/
-│   ├── controllers/        # Route controllers (e.g., trips.controller.js)
-│   ├── models/             # Mongoose models (e.g., trips.models.js)
-│   ├── routes/             # Express route files
-│   ├── DBConfig/           # Database config (e.g., DBconfig.js)
-│   └── app.js              # Express app setup
-├── DomesticTrip.json       # Sample preference file (domestic)
-├── ForeignTrip.json        # Sample preference file (foreign)
-├── index.js                # Main server file (entry point)
-├── package.json
-└── README.md
-
+│ ├── controllers/ # Route controllers (e.g., trips.controller.js)
+│ ├── models/ # Mongoose schemas and models (e.g., trips.model.js)
+│ ├── routes/ # Express route files (e.g., trips.routes.js)
+│ ├── DBConfig/ # MongoDB configuration (e.g., DBconfig.js)
+│ └── app.js # Main Express application setup
+├── DomesticTrip.json # Sample user preferences for domestic trips
+├── ForeignTrip.json # Sample user preferences for foreign trips
+├── index.js # Server entry point
+├── package.json # Project metadata and dependencies
+└── README.md # Project overview and instructions
 ---
 
 ## 🔗 Sample API Usage
