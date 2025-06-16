@@ -26,7 +26,7 @@ A smart travel backend built with **Node.js + Express** that combines **geolocat
 ## 📁 Folder Structure
 
 ---
-.
+
 ├── views/                  # EJS views for testing (index.ejs, docs.ejs)
 ├── public/                 # Static files (CSS, JS, images)
 ├── src/
