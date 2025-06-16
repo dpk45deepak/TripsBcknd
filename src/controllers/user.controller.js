@@ -1,5 +1,5 @@
 // ===============================================================
-// 3️⃣ HYBRID JWT AUTH (ACCESS + REFRESH TOKEN STORED IN DB)
+// HYBRID JWT AUTH (ACCESS + REFRESH TOKEN STORED IN DB)
 // ===============================================================
 
 import User from '../models/user.models.js';
