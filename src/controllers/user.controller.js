@@ -32,8 +32,8 @@ const generateTokens = (user) => {
 
 export const registerUser = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
-    if (!username || !email || !password) {
+    const { email, password } = req.body;
+    if ( !email || !password) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
@@ -44,7 +44,6 @@ export const registerUser = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
-      username,
       email,
       password: hashedPassword,
       tokens: []
@@ -54,7 +53,7 @@ export const registerUser = async (req, res) => {
     newUser.tokens.push({ refreshToken: tokens.refreshToken });
 
     await newUser.save();
-    console.log(`New user registered: ${newUser.username} with email: ${newUser.email}`); // Debugging line
+    console.log(`New user registered with email: ${newUser.email}`); // Debugging line
 
     res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
@@ -68,7 +67,6 @@ export const registerUser = async (req, res) => {
       accessToken: tokens.accessToken,
       user: {
         id: newUser._id,
-        username: newUser.username,
         email: newUser.email
       }
     });

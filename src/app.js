@@ -45,7 +45,7 @@ app.use(
     credentials: true,
   })
 );
-const allowedUnlimitedOrigin = process.env.CORS_ORIGIN;
+const allowedUnlimitedOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173';
 
 app.use(morgan('dev'));
 
