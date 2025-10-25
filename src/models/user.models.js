@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 
 const userSchema = new mongoose.Schema(
   {
+    // 🔹 Existing fields
     username: {
       type: String,
       required: true,
@@ -19,42 +20,78 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
       minlength: 7,
+    },
+    location: {
+      type: String,
+      default: '',
+    },
+    budget: {
+      type: Number,
+      default: 0,
+    },
+    history: [
+      {
+        type: String,
+        id: true,
+      },
+    ],
+    favoriteCategories: {
+      type: {
+        destinationType: { type: [String], default: [] },
+        climatePreference: { type: [String], default: [] },
+        activities: { type: [String], default: [] },
+        duration: { type: String, default: "Weekend" },
+        budget: { type: Number, default: 0 },
+      }
     },
     tokens: [
       {
         refreshToken: { type: String },
       },
     ],
+    // 🔹 Google OAuth specific fields
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true, // allow multiple nulls
+    },
+    profilePic: {
+      type: String,
+    },
+    emailVerified: {
+      type: Boolean,
+      default: false,
+    },
+    provider: {
+      type: String,
+      enum: ['local', 'google'],
+      default: 'local',
+    },
   },
   { timestamps: true }
 );
 
-// ✅ Generate username automatically BEFORE validation
-// (use 'validate' hook instead of 'save', so required passes)
+// Generate username automatically if not provided
 userSchema.pre('validate', function (next) {
   if (!this.username) {
-    this.username = 'user_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+    this.username =
+      'user_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
   }
   next();
 });
 
-// ✅ Password hashing (only if password is modified)
-// If you handle hashing in controller, keep it commented
-// Uncomment below if you want model-level hashing
-/*
+// Password hashing (only for local users)
 userSchema.pre('save', async function (next) {
-  if (this.isModified('password')) {
+  if (this.isModified('password') && this.password) {
     this.password = await bcrypt.hash(this.password, 10);
   }
   next();
 });
-*/
 
-// ✅ Static method to verify credentials
+// Static method to verify credentials for local users
 userSchema.statics.findByCredentials = async function (email, password) {
-  const user = await this.findOne({ email });
+  const user = await this.findOne({ email, provider: 'local' });
   if (!user) throw new Error('Invalid credentials');
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) throw new Error('Invalid credentials');

@@ -1,99 +1,97 @@
-import express from 'express';
-import path, { dirname }  from 'path';
-import cors from 'cors';
-import rateLimit from 'express-rate-limit';
-import morgan from 'morgan';
-import destination from './routes/AddInfo.routes.js';
-import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
-import userRouter from './routes/user.routes.js'
-import tripRouter from './routes/trips.routes.js'
-import cookieParser from 'cookie-parser';
+// Express Server imports
+import express from "express";
+import passport from "passport";
+import session from "express-session";
+import cookieParser from "cookie-parser";
+import rateLimit from "express-rate-limit";
+import dotenv from "dotenv";
+import cors from "cors";
+import morgan from "morgan";
+import path, { dirname } from "path";
+import { fileURLToPath } from "url";
 
+// Routes imports
+import userRouter from "./routes/User.routes.js";
+import destinationRouter from "./routes/destination.routes.js";
+import recommendationRouter from "./routes/Recommendation.routes.js";
 
 dotenv.config();
 
-
-//  ------- Handling __dirname in ES modules-------
+// Handling __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-
 const app = express();
 
-// Configure rate limiter outside the request handler
+// Allowed frontend origin
+const allowedOrigin = process.env.CORS_ORIGIN || "http://localhost:5173";
+
+// ⚙️ Rate limiter
 const apiLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 10,
-  message: 'You have exceeded the 10 requests per hour limit!',
+  max: 400,
+  message: "Too many requests from this IP, please try again after an hour!",
   standardHeaders: true,
   legacyHeaders: false,
 });
 
-
-// CORS middleware
+// ⚙️ CORS setup
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || origin === allowedUnlimitedOrigin || origin.startsWith(allowedUnlimitedOrigin)) {
-        callback(null, true);
-      } else {
-        callback(null, true); // still allow others, but they'll be rate-limited
+      if (!origin || origin === allowedOrigin || origin.startsWith(allowedOrigin)) {
+        return callback(null, true);
       }
+      return callback(new Error("Not allowed by CORS"));
     },
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true, // allows sending cookies/sessions
   })
 );
-const allowedUnlimitedOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173';
 
-app.use(morgan('dev'));
+// Logging
+app.use(morgan("dev"));
 
-// Dynamic rate limiter middleware: apply apiLimiter unless origin is unlimited
-const dynamicLimiter = (req, res, next) => {
-  const origin = req.headers.origin || '';
-  const isUnlimitedOrigin = origin === allowedUnlimitedOrigin || origin.startsWith(allowedUnlimitedOrigin);
-  
-  if (isUnlimitedOrigin) {
-    next(); // skip rate limiting
-  }
-  apiLimiter(req, res, next);
-};
+// ⚙️ Static & view setup
+app.use(express.static(path.join(__dirname, "public")));
+app.set("views", path.join(__dirname, "..", "views"));
+app.set("view engine", "ejs");
 
-// Apply the rate limiter to all requests
-// app.use(dynamicLimiter);
-
-// Static files and views
-app.use(express.static(path.join(__dirname, 'public')));
-app.set('views', path.join(__dirname, "..", 'views'));
-app.set('view engine', 'ejs');
-
-// common middleware.
-app.use(express.json({limit: "16kb"}));
-app.use(express.urlencoded({ extended: true, limit: "16kb"}));
-app.use(express.static("public"));
+// ⚙️ Body parsing
+app.use(express.json({ limit: "16kb" }));
+app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(cookieParser());
 
-// Default Routes
-app.get('/', (req, res) => {
-  res.render('index');
+// ⚙️ Session setup (must come before passport.session)
+app.use(
+  session({
+    secret: process.env.GOOGLE_SESSION_SECRET || "supersecret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false }, // true for HTTPS
+  })
+);
+
+// ⚙️ Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+// 🧩 Base route
+app.get("/", (req, res) => {
+  res.render("index");
 });
 
-app.get('/docs', (req, res) => {
-  res.render('docs');
+// 🧩 Ping route
+app.get("/api", (req, res) => {
+  res.json({ msg: "Hello Developer! Backend is running smoothly..!!" });
 });
 
-// random route
-app.get('/api', (req, res) => {
-  res.json({ msg: `Hello Developer it's Me..!! Deepak Kumar` });
-});
+// 🧩 Apply rate limiter to all /api routes
+app.use("/api", apiLimiter);
 
-// Weather & location info route
-app.use('/location-info', destination);
-
-// Trip info route
-app.use('/preference', tripRouter);
-
-app.use('/user', userRouter);
+// 🧩 Routes
+app.use("/api/users", userRouter);
+app.use("/api/destinations", destinationRouter);
+app.use("/api/recommendations", recommendationRouter);
 
 export default app;
