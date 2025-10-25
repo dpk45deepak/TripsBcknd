@@ -11,7 +11,7 @@ import { fileURLToPath } from "url";
 
 // Routes imports`
 import userRouter from "./src/routes/UserRoutes.js";
-import destinationRouter from "./src/routes/destination.routes.js";
+import destinationRouter from "./src/routes/Destination.routes.js";
 import recommendationRouter from "./src/routes/Recommendation.routes.js";
 
 dotenv.config();
