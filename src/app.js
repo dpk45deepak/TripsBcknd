@@ -1,6 +1,5 @@
 // Express Server imports
 import express from "express";
-import passport from "passport";
 import session from "express-session";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
