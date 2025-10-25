@@ -10,9 +10,9 @@ import path, { dirname } from "path";
 import { fileURLToPath } from "url";
 
 // Routes imports`
-import userRouter from "./routes/UserRoutes.js";
-import destinationRouter from "./routes/destination.routes.js";
-import recommendationRouter from "./routes/Recommendation.routes.js";
+import userRouter from "./src/routes/UserRoutes.js";
+import destinationRouter from "./src/routes/destination.routes.js";
+import recommendationRouter from "./src/routes/Recommendation.routes.js";
 
 dotenv.config();
 
