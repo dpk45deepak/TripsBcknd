@@ -53,7 +53,8 @@ app.use(morgan("dev"));
 
 // ⚙️ Static & view setup
 app.use(express.static(path.join(__dirname, "public")));
-app.set("views", path.join(__dirname, "..", "views"));
+// set views to the local `views` folder (was incorrectly using parent dir)
+app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
 // ⚙️ Body parsing
@@ -72,9 +73,15 @@ app.use(
 );
 
 
-// 🧩 Base route
+// 🧩 Base route - render view with fallback to static index.html
 app.get("/", (req, res) => {
-  res.render("index");
+  res.render("index", {}, (err, html) => {
+    if (err) {
+      // fallback to public/index.html if view not found or render fails
+      return res.sendFile(path.join(__dirname, "public", "index.html"));
+    }
+    res.send(html);
+  });
 });
 
 // 🧩 Ping route
