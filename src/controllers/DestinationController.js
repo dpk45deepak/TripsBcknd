@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import {
     Adventure,
     Beaches,
@@ -27,7 +28,15 @@ export const getDestinationById = async (req, res) => {
         const { type, id } = req.params; // e.g. /api/destinations/adventure/30
         const Model = getModel(type);
 
-        const destination = await Model.findOne({ id: Number(id) });
+        // Try numeric 'id' first, then fallback to Mongo _id
+        let destination = null;
+        const maybeNum = Number(id);
+        if (!Number.isNaN(maybeNum)) {
+            destination = await Model.findOne({ id: maybeNum });
+        }
+        if (!destination && mongoose.Types.ObjectId.isValid(id)) {
+            destination = await Model.findById(id);
+        }
         if (!destination)
             return res
                 .status(404)
@@ -133,11 +142,20 @@ export const UpdateDestination = async (req, res) => {
         const Model = getModel(type);
         const { type: _t, ...updateData } = data;
 
-        const updated = await Model.findOneAndUpdate(
-            { id: Number(id) },
-            updateData,
-            { new: true, runValidators: true }
-        );
+        // Attempt update by numeric id first, then by Mongo _id
+        let updated = null;
+        const maybeNum = Number(id);
+        if (!Number.isNaN(maybeNum)) {
+            updated = await Model.findOneAndUpdate(
+                { id: maybeNum },
+                updateData,
+                { new: true, runValidators: true }
+            );
+        }
+
+        if (!updated && mongoose.Types.ObjectId.isValid(id)) {
+            updated = await Model.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
+        }
 
         if (!updated) return res.status(404).json({ success: false, message: `No record found with ID ${id}` });
 
@@ -155,14 +173,31 @@ export const DeleteDestination = async (req, res) => {
 
         if (type) {
             const Model = getModel(type);
-            const deleted = await Model.findOneAndDelete({ id: Number(id) });
+            // try numeric id first
+            let deleted = null;
+            const maybeNum = Number(id);
+            if (!Number.isNaN(maybeNum)) {
+                deleted = await Model.findOneAndDelete({ id: maybeNum });
+            }
+            if (!deleted && mongoose.Types.ObjectId.isValid(id)) {
+                deleted = await Model.findByIdAndDelete(id);
+            }
+
             if (!deleted) return res.status(404).json({ success: false, message: `No record found with ID ${id} in ${type}` });
             return res.status(200).json({ success: true, message: `Deleted ID ${id} from ${type}` });
         }
 
         // No type provided: try each collection until found
         for (const [key, Model] of Object.entries(collectionsMap)) {
-            const deleted = await Model.findOneAndDelete({ id: Number(id) });
+            // try numeric id then _id
+            const maybeNum = Number(id);
+            let deleted = null;
+            if (!Number.isNaN(maybeNum)) {
+                deleted = await Model.findOneAndDelete({ id: maybeNum });
+            }
+            if (!deleted && mongoose.Types.ObjectId.isValid(id)) {
+                deleted = await Model.findByIdAndDelete(id);
+            }
             if (deleted) return res.status(200).json({ success: true, message: `Deleted ID ${id} from ${key}` });
         }
 

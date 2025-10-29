@@ -1,15 +1,11 @@
-// controllers/recommendationController.js
-import {
-    Adventure,
-    Beaches,
-    City,
-    NatureBeauty,
-    HistoricalAndCultural,
-} from "../models/index.js";
+// controllers/RecommendationController.js
 import User from "../models/user.models.js";
+import { Adventure, Beaches, City, NatureBeauty, HistoricalAndCultural } from "../models/index.js";
 
-// Helper to map category names to their corresponding Mongoose models
-const categoryModelMap = {
+/**
+ * Utility function to map destination types to collections
+ */
+const collectionMap = {
     adventure: Adventure,
     beaches: Beaches,
     city: City,
@@ -18,61 +14,71 @@ const categoryModelMap = {
 };
 
 /**
- * @desc Recommend destinations to a user based on favouriteCategories
- * @route GET /api/recommendations/:userId
- * @access Private / Authenticated
+ * @desc Recommend destinations based on user's favorite categories
+ * @route GET /api/recommend/:userId/:param1?/:param2?
  */
 export const recommendDestinations = async (req, res) => {
     try {
-        const { userId } = req.params;
+        const { userId, param1, param2 } = req.params;
 
-        // 1️⃣ Fetch user data
+        // 🔹 Step 1: Fetch user & their favorite categories
         const user = await User.findById(userId);
         if (!user) {
-            return res.status(404).json({ success: false, message: "User not found" });
+            return res.status(404).json({ message: "User not found" });
         }
 
-        // 2️⃣ Get favourite categories
-        const favouriteCategories = user.favouriteCategories || [];
-        if (favouriteCategories.length === 0) {
-            return res.status(200).json({
-                success: true,
-                message: "No favourite categories found for this user.",
-                recommendations: [],
-            });
+        const favorite = user.favoriteCategories || {};
+        const destinationTypes = favorite.destinationType || [];
+
+        if (destinationTypes.length === 0) {
+            return res.status(400).json({ message: "No favorite categories set for this user." });
         }
 
-        // 3️⃣ Fetch destinations from each relevant category
-        const recommendations = [];
-        for (const category of favouriteCategories) {
-            const model = categoryModelMap[category.toLowerCase()];
-            if (model) {
-                // You can tweak this limit for better results
-                const destinations = await model.aggregate([
-                    { $sample: { size: 4 } }, // randomly pick 4 destinations
-                ]);
-                recommendations.push(...destinations);
+        // 🔹 Step 2: Collect matching destinations from all collections based on destinationType
+        const allResults = [];
+
+        for (const type of destinationTypes) {
+            const normalizedType = type.toLowerCase().replace(/\s+/g, "_");
+            const Model = collectionMap[normalizedType];
+
+            if (!Model) continue;
+
+            // Filter handling
+            let query = {};
+
+            if (!param1 && !param2) {
+                // Default: recommend based on type
+                query = {};
+            } else if (param1 && !param2) {
+                // Example: param1 = "March" → best time to visit
+                query = { best_time_to_visit: { $in: [param1] } };
+            } else if (param1 && param2) {
+                // Example: /:userId/country/India  → filter by country
+                const field = param1.toLowerCase();
+                const value = param2;
+                if (["country", "region", "type", "name"].includes(field)) {
+                    query[field] = { $regex: new RegExp(value, "i") };
+                }
             }
+
+            const results = await Model.find(query).limit(10);
+            allResults.push(...results);
         }
 
-        // 4️⃣ Remove duplicates (in case same destination exists in multiple categories)
-        const uniqueRecommendations = recommendations.filter(
-            (item, index, self) =>
-                index === self.findIndex((t) => t._id.toString() === item._id.toString())
-        );
+        if (allResults.length === 0) {
+            return res.status(404).json({ message: "No destinations found for user preferences." });
+        }
 
-        // 5️⃣ Return results
+        // 🔹 Step 3: Optionally rank or shuffle results
+        const shuffled = allResults.sort(() => Math.random() - 0.5);
+
         res.status(200).json({
             success: true,
-            total: uniqueRecommendations.length,
-            recommendations: uniqueRecommendations,
+            count: shuffled.length,
+            recommendations: shuffled,
         });
     } catch (error) {
-        console.error("Recommendation Error:", error);
-        res.status(500).json({
-            success: false,
-            message: "Error fetching recommendations.",
-            error: error.message,
-        });
+        console.error("Error recommending destinations:", error);
+        res.status(500).json({ message: "Server error", error: error.message });
     }
 };

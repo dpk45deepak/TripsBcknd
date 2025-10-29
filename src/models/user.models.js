@@ -27,8 +27,8 @@ const userSchema = new mongoose.Schema(
       default: '',
     },
     budget: {
-      type: Number,
-      default: 0,
+      type: String,
+      default: '0',
     },
     history: [
       {
@@ -68,6 +68,35 @@ const userSchema = new mongoose.Schema(
       enum: ['local', 'google'],
       default: 'local',
     },
+    website: {
+      type: String,
+      default: '',
+    },
+    dateOfBirth: {
+      type: Date,
+      default: null,
+    },
+    phone: {
+      type: String,
+      default: '',
+    },
+    notificationsEnabled: {
+      type: Boolean,
+      default: true,
+    },
+    newslettersEnabled: {
+      type: Boolean,
+      default: true,
+    },
+    themePreference: {
+      type: String,
+      enum: ['light', 'dark', 'system'],
+      default: 'system',
+    },
+    bio: {
+      type: String,
+      default: 'Travel enthusiast!',
+    }
   },
   { timestamps: true }
 );

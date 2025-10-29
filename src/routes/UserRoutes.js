@@ -5,6 +5,7 @@ import {
     getUserProfile,
     logOut,
     refreshToken,
+    updateUserProfile,
     setFavouriteCategories
 } from "../controllers/UserController.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
@@ -39,6 +40,11 @@ router.get("/profile", authMiddleware, (req, res, next) => {
 router.post("/refresh-token", (req, res, next) => {
     console.log("[ROUTE] POST /users/refresh-token");
     refreshToken(req, res, next);
+});
+
+router.post("/:userId/update-profile", (req, res, next) => {
+    console.log("[ROUTE] POST /users/:userId/update-profile");
+    updateUserProfile(req, res, next);
 });
 
 // Set or update user's favourite categories

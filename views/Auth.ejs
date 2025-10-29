@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Secure Access</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="icon" type="image/png" href="/app.png" />
+<style>
+/* Spinner Animation */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.animate-spin { animation: spin 1s linear infinite; }
+/* Biometric pulse animation */
+@keyframes pulse-scale {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.1); opacity: 1; }
+}
+.pulse-anim { animation: pulse-scale 2s ease-in-out infinite; }
+/* Rotate animation */
+@keyframes rotate360 { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.rotate-anim { animation: rotate360 3s linear infinite; }
+/* Floating animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(180deg); }
+}
+</style>
+</head>
+<body class="bg-gradient-to-br from-teal-400 via-blue-500 to-pink-200 min-h-screen flex items-center justify-center relative overflow-hidden">
+
+<!-- Floating particles -->
+<div id="particles"></div>
+
+<div class="bg-white/95 backdrop-blur-lg p-8 rounded-3xl shadow-2xl w-96 max-w-[90vw] relative z-10 border border-white/20">
+  <!-- Header -->
+  <div class="text-center mb-8">
+    <div class="w-16 h-16 bg-gradient-to-r from-teal-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+      <!-- Fingerprint SVG -->
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="white" class="w-7 h-7">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 2.5-1 5-3 6s-2 3-2 3m6-9c0 2 1 4 3 5s2 3 2 3m-6-9V5m0 0c1.5 1.5 3 3 3 6s-1 4-3 5-3 2-3 2"/>
+      </svg>
+    </div>
+    <h1 class="text-3xl font-bold bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent mb-2">Secure Access</h1>
+    <p class="text-gray-600">Choose your authentication method</p>
+  </div>
+
+  <!-- Auth Method Tabs -->
+  <div class="flex space-x-2 mb-6 p-2 bg-gray-100 rounded-2xl">
+    <button id="tab-password" class="flex-1 px-4 py-2 rounded-xl bg-white shadow-lg text-blue-600 font-medium">Password</button>
+    <button id="tab-biometric" class="flex-1 px-4 py-2 rounded-xl text-gray-600 hover:text-gray-800 font-medium">Biometric</button>
+  </div>
+
+  <!-- Auth Method Content -->
+  <div id="auth-content">
+    <!-- Password Login -->
+    <div id="password-login" class="space-y-4">
+      <div class="relative">
+        <input type="password" id="password-input" placeholder="Enter your password" class="border border-gray-300 p-4 w-full rounded-xl pr-12 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300">
+        <button type="button" id="toggle-password" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+          👁️
+        </button>
+      </div>
+      <button id="password-submit" class="bg-gradient-to-r from-blue-500 to-teal-600 text-white px-6 py-4 rounded-xl font-bold w-full transition-all duration-300 shadow-lg hover:shadow-xl hover:from-blue-600 hover:to-purple-700">
+        Unlock with Password
+      </button>
+      <p id="attempts-msg" class="text-sm text-red-500 text-center hidden"></p>
+    </div>
+
+    <!-- Biometric Login -->
+    <div id="biometric-login" class="space-y-6 hidden">
+      <div class="flex justify-center">
+        <div class="relative pulse-anim">
+          <div class="w-24 h-24 bg-gradient-to-br from-blue-400 to-purple-500 rounded-2xl flex items-center justify-center shadow-2xl">
+            <!-- Fingerprint icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="white" class="w-10 h-10">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 2.5-1 5-3 6s-2 3-2 3m6-9c0 2 1 4 3 5s2 3 2 3m-6-9V5m0 0c1.5 1.5 3 3 3 6s-1 4-3 5-3 2-3 2"/>
+            </svg>
+          </div>
+          <div class="absolute -2 inset-0 border-4 border-blue-400 border-t-transparent rounded-2xl rotate-anim"></div>
+        </div>
+      </div>
+      <div class="text-center space-y-2">
+        <h3 class="text-lg font-semibold text-gray-800">Biometric Authentication</h3>
+        <p class="text-sm text-gray-600">Use your fingerprint or face to unlock</p>
+      </div>
+      <button id="biometric-btn" class="bg-gradient-to-r from-green-500 to-blue-600 text-white px-6 py-4 rounded-xl font-bold w-full transition-all duration-300 shadow-lg hover:shadow-xl hover:from-green-600 hover:to-blue-700">
+        Authenticate with Biometrics
+      </button>
+      <p id="biometric-error" class="text-sm text-red-500 text-center p-3 bg-red-50 rounded-lg hidden"></p>
+    </div>
+  </div>
+
+  <!-- Security Badge -->
+  <div class="mt-6 p-3 bg-green-50 border border-green-200 rounded-xl flex items-center space-x-3">
+    <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+      <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+      </svg>
+    </div>
+    <div>
+      <p class="text-sm font-semibold text-green-800">Secure Connection</p>
+      <p class="text-xs text-green-600">End-to-end encrypted</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// State
+let authMethod = "password";
+let showPassword = false;
+let loginAttempts = 0;
+const maxAttempts = 3;
+const correctPassword = "DB_Admin";
+
+// Elements
+const tabPassword = document.getElementById("tab-password");
+const tabBiometric = document.getElementById("tab-biometric");
+const passwordLogin = document.getElementById("password-login");
+const biometricLogin = document.getElementById("biometric-login");
+const passwordInput = document.getElementById("password-input");
+const togglePassword = document.getElementById("toggle-password");
+const passwordSubmit = document.getElementById("password-submit");
+const attemptsMsg = document.getElementById("attempts-msg");
+const biometricBtn = document.getElementById("biometric-btn");
+const biometricError = document.getElementById("biometric-error");
+
+// Switch tabs
+tabPassword.addEventListener("click", () => {
+  authMethod = "password";
+  passwordLogin.classList.remove("hidden");
+  biometricLogin.classList.add("hidden");
+  tabPassword.classList.add("bg-white","shadow-lg","text-blue-600");
+  tabBiometric.classList.remove("bg-white","shadow-lg","text-blue-600");
+});
+tabBiometric.addEventListener("click", () => {
+  authMethod = "biometric";
+  passwordLogin.classList.add("hidden");
+  biometricLogin.classList.remove("hidden");
+  tabBiometric.classList.add("bg-white","shadow-lg","text-blue-600");
+  tabPassword.classList.remove("bg-white","shadow-lg","text-blue-600");
+});
+
+// Toggle password visibility
+togglePassword.addEventListener("click", () => {
+  showPassword = !showPassword;
+  passwordInput.type = showPassword ? "text" : "password";
+  togglePassword.textContent = showPassword ? "🙈" : "👁️";
+});
+
+// Handle password login
+passwordSubmit.addEventListener("click", () => {
+  if (loginAttempts >= maxAttempts) {
+    alert("Too many failed attempts. Please try biometric authentication or wait 5 minutes.");
+    return;
+  }
+  if (passwordInput.value === correctPassword) {
+    alert("Access granted! Redirecting to dashboard...");
+    window.location.href = "/dashboard";
+  } else {
+    loginAttempts++;
+    attemptsMsg.textContent = `${maxAttempts - loginAttempts} attempt(s) remaining`;
+    attemptsMsg.classList.remove("hidden");
+    alert("Wrong password!");
+    passwordInput.value = "";
+  }
+});
+
+// Handle Enter key in password field
+passwordInput.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") {
+    passwordSubmit.click();
+  }
+});
+
+// Handle biometric login simulation
+biometricBtn.addEventListener("click", () => {
+  biometricError.classList.add("hidden");
+  biometricBtn.disabled = true;
+  biometricBtn.textContent = "Scanning...";
+  
+  setTimeout(() => {
+    const success = Math.random() > 0.2;
+    if(success) {
+      alert("Biometric authentication success! Redirecting to dashboard...");
+      window.location.href = "/dashboard";
+    } else {
+      biometricError.textContent = "Biometric authentication failed. Please try again.";
+      biometricError.classList.remove("hidden");
+      biometricBtn.disabled = false;
+      biometricBtn.textContent = "Authenticate with Biometrics";
+    }
+  }, 2000);
+});
+
+// Floating particles
+const particlesContainer = document.getElementById("particles");
+for(let i = 0; i < 20; i++){
+  const div = document.createElement("div");
+  div.className = "absolute w-2 h-2 bg-white/30 rounded-full";
+  div.style.left = Math.random() * 100 + "vw";
+  div.style.top = Math.random() * 100 + "vh";
+  div.style.animation = `float ${Math.random() * 3 + 2}s ease-in-out ${Math.random() * 2}s infinite`;
+  particlesContainer.appendChild(div);
+}
+</script>
+</body>
+</html>

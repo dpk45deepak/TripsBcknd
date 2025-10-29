@@ -4,7 +4,10 @@ import { recommendDestinations } from "../controllers/RecommendationController.j
 
 const router = express.Router();
 
-// GET recommendations for a user
-router.get("/:userId", recommendDestinations);
+// Single route that supports multiple shapes:
+// GET /:userId
+// GET /:userId/:month                -> best time to visit (month)
+// GET /:userId/:filter/:value       -> filter by field (e.g. type, country, region)
+router.get("/:userId/:param1?/:param2?", recommendDestinations);
 
 export default router;

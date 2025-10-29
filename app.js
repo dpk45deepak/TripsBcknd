@@ -84,6 +84,14 @@ app.get("/", (req, res) => {
   });
 });
 
+app.get("/auth", (req, res) => {
+  res.render("Auth");
+})
+
+app.get("/dashboard", (req, res) => {
+  res.render("Dashboard");
+})
+
 // 🧩 Ping route
 app.get("/api", (req, res) => {
   res.json({ msg: "Hello Developer! Backend is running smoothly..!!" });

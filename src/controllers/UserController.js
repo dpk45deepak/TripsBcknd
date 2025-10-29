@@ -1,5 +1,6 @@
 // HYBRID JWT AUTH (ACCESS + REFRESH TOKEN STORED IN DB)
 import User from '../models/user.models.js';
+import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
@@ -311,7 +312,7 @@ export const setFavouriteCategories = async (req, res) => {
       "beaches",
       "city",
       "cities",
-      "nature_beauty",
+      "nature's beauty",
       "historical_and_cultural",
       "forests",
       "deserts",
@@ -380,5 +381,105 @@ export const setFavouriteCategories = async (req, res) => {
     if (error.name === "CastError") return res.status(400).json({ message: "Invalid userId" });
     if (error.name === "ValidationError") return res.status(400).json({ message: error.message });
     return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const ALLOWED_FIELDS = [
+  "username",
+  "bio",
+  "email",
+  "location",
+  "budget",
+  "themePreference",
+  "notificationsEnabled",
+  "newslettersEnabled",
+  "dateOfBirth",
+  "phone",
+  "website",
+];
+
+export const updateUserProfile = async (req, res) => {
+  try {
+    // ✅ 1. Validate userId source
+    const userId = req.params.userId || req.params.id || req.body.userId;
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "userId is required in route params or body.",
+      });
+    }
+
+    // ✅ 2. Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid userId format.",
+      });
+    }
+
+    // ✅ 3. Validate and sanitize update data
+    const updates = {};
+    for (const key of Object.keys(req.body)) {
+      if (ALLOWED_FIELDS.includes(key)) {
+          updates[key] = req.body[key];
+      }
+    }
+
+    // Prevent empty update requests
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No valid fields provided for update.",
+      });
+    }
+
+    // ✅ 4. Validate specific fields manually (optional, extend as needed)
+    if (updates.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(updates.email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email format.",
+      });
+    }
+
+    // ✅ 5. Update user safely
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $set: updates },
+      {
+        new: true,
+        runValidators: true,
+        select: "-password -tokens", // never expose
+      }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    // ✅ 6. Success Response
+    return res.status(200).json({
+      success: true,
+      message: "User profile updated successfully.",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("Error updating user profile:", error);
+
+    // ✅ 7. Handle known errors cleanly
+    if (error.name === "CastError") {
+      return res.status(400).json({ success: false, message: "Invalid userId." });
+    }
+    if (error.name === "ValidationError") {
+      return res.status(400).json({ success: false, message: error.message });
+    }
+
+    // ✅ 8. Fallback for unexpected errors
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error.",
+    });
   }
 };

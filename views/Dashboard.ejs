@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripBcknd - Advanced Database Admin</title>
+    <link rel="icon" type="image/png" href="/app.png" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+        :root {
+            --teal-primary: #0d9488;
+            --teal-light: #5eead4;
+            --blue-primary: #0369a1;
+            --blue-light: #7dd3fc;
+            --indigo-primary: #4f46e5;
+            --indigo-light: #a5b4fc;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, var(--teal-primary) 0%, var(--blue-primary) 50%, var(--indigo-primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .card-hover {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(13, 148, 136, 0.2);
+        }
+        
+        .floating {
+            animation: floating 6s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0% { transform: translate(0, 0px); }
+            50% { transform: translate(0, 15px); }
+            100% { transform: translate(0, -0px); }
+        }
+        
+        .pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 5px rgba(13, 148, 136, 0.4); }
+            50% { box-shadow: 0 0 20px rgba(13, 148, 136, 0.8); }
+            100% { box-shadow: 0 0 5px rgba(13, 148, 136, 0.4); }
+        }
+        
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-collapsed {
+            width: 80px;
+        }
+        
+        .sidebar-expanded {
+            width: 280px;
+        }
+        
+        .main-content-expanded {
+            margin-left: 280px;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .main-content-collapsed {
+            margin-left: 80px;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .grid-masonry {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            grid-auto-rows: 10px;
+        }
+        
+        .grid-item {
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .search-pulse {
+            animation: searchPulse 2s infinite;
+        }
+        
+        @keyframes searchPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .typewriter {
+            overflow: hidden;
+            border-right: .15em solid var(--teal-primary);
+            white-space: nowrap;
+            animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
+        }
+        
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--teal-primary); }
+        }
+        
+        .bounce-in {
+            animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        }
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .holographic {
+            background: linear-gradient(125deg, 
+                rgba(255,255,255,0.1) 0%, 
+                rgba(13,148,136,0.1) 25%, 
+                rgba(3,105,161,0.1) 50%, 
+                rgba(79,70,229,0.1) 75%, 
+                rgba(255,255,255,0.1) 100%);
+            background-size: 400% 400%;
+            animation: holographicMove 8s ease-in-out infinite;
+        }
+        
+        @keyframes holographicMove {
+            0% { background-position: 0% 50% }
+            50% { background-position: 100% 50% }
+            100% { background-position: 0% 50% }
+        }
+        
+        .active-tab {
+            background: linear-gradient(135deg, rgba(13, 148, 136, 0.1) 0%, rgba(3, 105, 161, 0.1) 100%);
+            border-left: 4px solid var(--teal-primary);
+        }
+        
+        .table-view {
+            display: none;
+        }
+        
+        .table-row-hover:hover {
+            background-color: rgba(13, 148, 136, 0.05);
+        }
+        
+        .add-destination-modal {
+            display: none;
+        }
+        
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .sidebar-expanded {
+                width: 100%;
+                z-index: 100;
+            }
+            
+            .sidebar-collapsed {
+                width: 0;
+                overflow: hidden;
+            }
+            
+            .main-content-expanded, .main-content-collapsed {
+                margin-left: 0;
+            }
+            
+            .grid-masonry {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-bar-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .action-bar-buttons > div {
+                width: 100%;
+            }
+            
+            .action-bar-buttons button {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-blue-50 text-gray-800 font-['Inter'] overflow-x-hidden">
+    <!-- Animated Background Elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="absolute -top-40 -right-40 w-80 h-80 bg-teal-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 floating"></div>
+        <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 floating" style="animation-delay: 2s;"></div>
+        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-indigo-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 floating" style="animation-delay: 4s;"></div>
+    </div>
+
+    <!-- Sidebar -->
+<!-- Sidebar -->
+<div
+  id="sidebar"
+  class="sidebar sidebar-expanded fixed h-full w-72 bg-white/90 backdrop-blur-xl border-r border-gray-200 shadow-2xl z-20 flex flex-col transition-all duration-500"
+>
+  <!-- Header -->
+  <div class="p-6 border-b border-gray-200 flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <div
+        class="w-11 h-11 rounded-2xl bg-gradient-to-br from-teal-500 to-indigo-600 flex items-center justify-center text-white shadow-lg"
+      >
+        <i class="fas fa-database text-lg"></i>
+      </div>
+      <h1
+        class="text-2xl font-extrabold bg-gradient-to-r from-teal-500 to-blue-600 bg-clip-text text-transparent"
+      >
+        TripBcknd DB
+      </h1>
+    </div>
+    <button
+      id="sidebar-toggle"
+      class="text-gray-500 hover:text-teal-600 transition-all duration-300 hover:rotate-90"
+    >
+      <i class="fas fa-bars text-lg"></i>
+    </button>
+  </div>
+
+  <div class="p-5 flex-1 overflow-y-auto space-y-10 scrollbar-thin scrollbar-thumb-teal-400 scrollbar-track-gray-100">
+    <!-- Collections -->
+    <div>
+      <h2
+        class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3"
+      >
+        Collections
+      </h2>
+      <div class="space-y-2">
+        <!-- Active Collection Example -->
+        <button
+          class="collection-tab w-full text-left py-3 px-4 rounded-xl flex items-center justify-between bg-gradient-to-r from-teal-500/10 to-blue-500/10 shadow-sm border border-teal-200 hover:shadow-md hover:scale-[1.02] transition-all duration-300 active-tab"
+          data-collection="adventure"
+        >
+          <div class="flex items-center">
+            <div
+              class="w-9 h-9 rounded-lg bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center text-white mr-3"
+            >
+              <i class="fas fa-mountain"></i>
+            </div>
+            <span class="font-medium text-gray-800">Adventure</span>
+          </div>
+          <span
+            class="bg-gradient-to-r from-teal-500 to-blue-500 text-white text-xs font-semibold px-2 py-1 rounded-full"
+            >24</span
+          >
+        </button>
+
+        <!-- Other Collections -->
+        <button
+          class="collection-tab w-full text-left py-3 px-4 rounded-xl flex items-center justify-between hover:bg-teal-50 hover:shadow-md transition-all duration-300"
+          data-collection="beaches"
+        >
+          <div class="flex items-center">
+            <div
+              class="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center text-white mr-3"
+            >
+              <i class="fas fa-umbrella-beach"></i>
+            </div>
+            <span class="font-medium text-gray-700">Beaches</span>
+          </div>
+          <span
+            class="bg-teal-100 text-teal-800 text-xs font-semibold px-2 py-1 rounded-full"
+            >18</span
+          >
+        </button>
+
+        <button
+          class="collection-tab w-full text-left py-3 px-4 rounded-xl flex items-center justify-between hover:bg-teal-50 hover:shadow-md transition-all duration-300"
+          data-collection="city"
+        >
+          <div class="flex items-center">
+            <div
+              class="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center text-white mr-3"
+            >
+              <i class="fas fa-city"></i>
+            </div>
+            <span class="font-medium text-gray-700">City</span>
+          </div>
+          <span
+            class="bg-teal-100 text-teal-800 text-xs font-semibold px-2 py-1 rounded-full"
+            >32</span
+          >
+        </button>
+
+        <button
+          class="collection-tab w-full text-left py-3 px-4 rounded-xl flex items-center justify-between hover:bg-teal-50 hover:shadow-md transition-all duration-300"
+          data-collection="nature_beauty"
+        >
+          <div class="flex items-center">
+            <div
+              class="w-9 h-9 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center text-white mr-3"
+            >
+              <i class="fas fa-tree"></i>
+            </div>
+            <span class="font-medium text-gray-700">Nature & Beauty</span>
+          </div>
+          <span
+            class="bg-teal-100 text-teal-800 text-xs font-semibold px-2 py-1 rounded-full"
+            >27</span
+          >
+        </button>
+
+        <button
+          class="collection-tab w-full text-left py-3 px-4 rounded-xl flex items-center justify-between hover:bg-teal-50 hover:shadow-md transition-all duration-300"
+          data-collection="historical_and_cultural"
+        >
+          <div class="flex items-center">
+            <div
+              class="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-500 to-yellow-500 flex items-center justify-center text-white mr-3"
+            >
+              <i class="fas fa-landmark"></i>
+            </div>
+            <span class="font-medium text-gray-700">Historical & Cultural</span>
+          </div>
+          <span
+            class="bg-teal-100 text-teal-800 text-xs font-semibold px-2 py-1 rounded-full"
+            >15</span
+          >
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div>
+      <h2
+        class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3"
+      >
+        Quick Actions
+      </h2>
+      <div class="space-y-2">
+        <button
+          id="quick-add"
+          class="w-full py-3 px-4 rounded-xl flex items-center justify-center bg-gradient-to-r from-teal-500 to-blue-600 text-white shadow-lg hover:shadow-2xl hover:scale-[1.02] transition-all duration-300"
+        >
+          <i class="fas fa-plus-circle mr-3"></i>
+          <span>Add New Destination</span>
+        </button>
+        <button
+          id="quick-search"
+          class="w-full py-3 px-4 rounded-xl flex items-center justify-center bg-white border border-teal-200 text-teal-700 shadow-sm hover:shadow-lg hover:bg-teal-50 transition-all duration-300"
+        >
+          <i class="fas fa-search mr-3"></i>
+          <span>Advanced Search</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Database Stats -->
+    <div>
+      <h2
+        class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3"
+      >
+        Database Stats
+      </h2>
+      <div
+        class="bg-gradient-to-br from-teal-50 to-blue-50 rounded-xl p-4 border border-teal-100 shadow-sm hover:shadow-md transition-all duration-300"
+      >
+        <div class="flex justify-between items-center mb-3">
+          <span class="text-sm font-medium text-gray-700"
+            >Total Destinations</span
+          >
+          <span class="text-lg font-bold text-teal-700">116</span>
+        </div>
+        <div class="flex justify-between items-center mb-3">
+          <span class="text-sm font-medium text-gray-700">Collections</span>
+          <span class="text-lg font-bold text-blue-700">5</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-sm font-medium text-gray-700">Last Updated</span>
+          <span class="text-xs font-medium text-gray-500">Just now</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- Main Content -->
+    <div id="main-content" class="main-content-expanded relative z-5">
+        <!-- Top Bar -->
+        <div class="bg-white/80 backdrop-blur-lg border-b border-gray-200 p-4 sticky top-0 z-20">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
+                <div class="mb-4 md:mb-0">
+                    <h1 id="collection-title" class="text-2xl font-bold text-gray-800">Adventure Destinations</h1>
+                    <p id="collection-subtitle" class="text-gray-600">Manage all adventure travel destinations in the database</p>
+                </div>
+                <div class="flex items-center space-x-4 w-full md:w-auto">
+                    <div class="relative flex-1 md:flex-none">
+                        <input type="text" id="global-search" placeholder="Search destinations..." class="pl-10 pr-4 py-2 rounded-xl border border-gray-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all w-full md:w-64">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    </div>
+                    <button id="refresh-data" class="p-2 rounded-xl bg-white border border-gray-300 text-gray-700 hover:bg-teal-50 hover:border-teal-300 transition-all">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                    <button class="p-2 rounded-xl bg-gradient-to-r from-teal-500 to-blue-600 text-white shadow-lg hover:shadow-xl transition-all pulse-glow">
+                        <i class="fas fa-rocket"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="p-6">
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-2xl shadow-lg p-5 border border-gray-100 card-hover">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-500 text-sm font-medium">Total in Collection</p>
+                            <h3 class="text-2xl font-bold text-gray-800 mt-1">24</h3>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 flex items-center justify-center text-white">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex items-center text-sm">
+                        <span class="text-green-500 flex items-center">
+                            <i class="fas fa-arrow-up mr-1"></i> 12%
+                        </span>
+                        <span class="text-gray-500 ml-2">from last month</span>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-lg p-5 border border-gray-100 card-hover">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-500 text-sm font-medium">Avg. Safety Rating</p>
+                            <h3 class="text-2xl font-bold text-gray-800 mt-1">8.2/10</h3>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-green-500 h-2 rounded-full" style="width: 82%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-lg p-5 border border-gray-100 card-hover">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-500 text-sm font-medium">Avg. Cost/Day</p>
+                            <h3 class="text-2xl font-bold text-gray-800 mt-1">$145</h3>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center text-white">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex items-center text-sm">
+                        <span class="text-red-500 flex items-center">
+                            <i class="fas fa-arrow-down mr-1"></i> 5%
+                        </span>
+                        <span class="text-gray-500 ml-2">from last month</span>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-lg p-5 border border-gray-100 card-hover">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-500 text-sm font-medium">Active Users</p>
+                            <h3 class="text-2xl font-bold text-gray-800 mt-1">1,248</h3>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex items-center text-sm">
+                        <span class="text-green-500 flex items-center">
+                            <i class="fas fa-arrow-up mr-1"></i> 8%
+                        </span>
+                        <span class="text-gray-500 ml-2">from last week</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Bar -->
+            <div class="bg-white rounded-2xl shadow-lg p-5 border border-gray-100 mb-8">
+                <div class="action-bar-buttons flex flex-col md:flex-row justify-between items-start md:items-center">
+                    <div class="flex flex-wrap gap-3 mb-4 md:mb-0">
+                        <button id="view-toggle-grid" class="px-4 py-2 rounded-xl bg-gradient-to-r from-teal-500 to-blue-600 text-white shadow-lg">
+                            <i class="fas fa-th-large mr-2"></i>Grid View
+                        </button>
+                        <button id="view-toggle-table" class="px-4 py-2 rounded-xl bg-white border border-gray-300 text-gray-700 hover:bg-gray-50">
+                            <i class="fas fa-table mr-2"></i>Table View
+                        </button>
+                    </div>
+                    <div class="flex flex-wrap gap-3 w-full md:w-auto">
+                        <button id="filter-toggle" class="px-4 py-2 rounded-xl bg-white border border-gray-300 text-gray-700 hover:bg-gray-50">
+                            <i class="fas fa-filter mr-2"></i>Filters
+                        </button>
+                        <button id="export-data" class="px-4 py-2 rounded-xl bg-white border border-gray-300 text-gray-700 hover:bg-gray-50">
+                            <i class="fas fa-file-export mr-2"></i>Export
+                        </button>
+                        <button id="add-destination" class="px-4 py-2 rounded-xl bg-gradient-to-r from-teal-500 to-blue-600 text-white shadow-lg hover:shadow-xl transition-all">
+                            <i class="fas fa-plus mr-2"></i>Add Destination
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Filter Panel -->
+                <div id="filter-panel" class="mt-6 p-4 bg-gray-50 rounded-xl border border-gray-200 hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                            <select class="w-full rounded-xl border border-gray-300 px-3 py-2 focus:border-teal-500 focus:ring-2 focus:ring-teal-200">
+                                <option>All Countries</option>
+                                <option>United States</option>
+                                <option>France</option>
+                                <option>Japan</option>
+                                <option>Australia</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Safety Rating</label>
+                            <select class="w-full rounded-xl border border-gray-300 px-3 py-2 focus:border-teal-500 focus:ring-2 focus:ring-teal-200">
+                                <option>Any Rating</option>
+                                <option>9+ (Excellent)</option>
+                                <option>7-8 (Good)</option>
+                                <option>5-6 (Average)</option>
+                                <option>Below 5 (Poor)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Cost Range</label>
+                            <select class="w-full rounded-xl border border-gray-300 px-3 py-2 focus:border-teal-500 focus:ring-2 focus:ring-teal-200">
+                                <option>Any Cost</option>
+                                <option>Budget ($0-50)</option>
+                                <option>Moderate ($50-150)</option>
+                                <option>Expensive ($150-300)</option>
+                                <option>Luxury ($300+)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Best Time</label>
+                            <select class="w-full rounded-xl border border-gray-300 px-3 py-2 focus:border-teal-500 focus:ring-2 focus:ring-teal-200">
+                                <option>Any Time</option>
+                                <option>Spring</option>
+                                <option>Summer</option>
+                                <option>Fall</option>
+                                <option>Winter</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex justify-end mt-4">
+                        <button id="filter-reset" class="px-4 py-2 rounded-xl bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 mr-2">
+                            Reset
+                        </button>
+                        <button id="filter-apply" class="px-4 py-2 rounded-xl bg-gradient-to-r from-teal-500 to-blue-600 text-white shadow-lg hover:shadow-xl">
+                            Apply Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Destinations Grid -->
+            <div id="destinations-grid" class="grid-masonry">
+                <!-- Destination cards will be dynamically inserted here -->
+            </div>
+            
+            <!-- Table View -->
+            <div id="destinations-table" class="table-view bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Destination</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Country</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Safety</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cost/Day</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Best Time</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body" class="bg-white divide-y divide-gray-200">
+                            <!-- Table rows will be dynamically inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <div class="fixed bottom-6 right-6 z-30">
+        <button id="fab" class="w-14 h-14 rounded-full bg-gradient-to-r from-teal-500 to-blue-600 text-white shadow-2xl flex items-center justify-center hover:shadow-2xl transition-all">
+            <i class="fas fa-plus text-xl"></i>
+        </button>
+    </div>
+
+    <!-- Search Modal -->
+    <div id="search-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-xl font-bold text-gray-800">Advanced Destination Search</h2>
+                <p class="text-gray-600 mt-1">Find destinations by multiple criteria</p>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Destination Name</label>
+                        <input type="text" class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                        <input type="text" class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Region</label>
+                        <input type="text" class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Destination Type</label>
+                        <select class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-teal-500 focus:ring-2 focus:ring-teal-200">
+                            <option value="">All Types</option>
+                            <option value="adventure">Adventure</option>
+                            <option value="beaches">Beaches</option>
+                            <option value="city">City</option>
+                            <option value="nature_beauty">Nature & Beauty</option>
+                            <option value="historical_and_cultural">Historical & Cultural</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Cost Range (per day)</label>
+                    <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4">
+                        <input type="number" placeholder="Min" class="w-full md:w-1/2 rounded-xl border border-gray-300 px-4 py-3 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all">
+                        <span class="text-gray-500">to</span>
+                        <input type="number" placeholder="Max" class="w-full md:w-1/2 rounded-xl border border-gray-300 px-4 py-3 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all">
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Safety Rating</label>
+                    <div class="flex flex-wrap gap-2">
+                        <button class="px-4 py-2 rounded-xl bg-teal-100 text-teal-800 border border-teal-200">Any</button>
+                        <button class="px-4 py-2 rounded-xl bg-white text-gray-700 border border-gray-300 hover:bg-gray-50">7+</button>
+                        <button class="px-4 py-2 rounded-xl bg-white text-gray-700 border border-gray-300 hover:bg-gray-50">8+</button>
+                        <button class="px-4 py-2 rounded-xl bg-white text-gray-700 border border-gray-300 hover:bg-gray-50">9+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-col md:flex-row justify-end p-6 border-t border-gray-200">
+                <button id="search-cancel" class="px-6 py-3 rounded-xl bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 mb-3 md:mb-0 md:mr-3">
+                    Cancel
+                </button>
+                <button class="px-6 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-blue-600 text-white shadow-lg hover:shadow-xl transition-all search-pulse">
+                    <i class="fas fa-search mr-2"></i> Search Destinations
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Destination Modal -->
+    <div id="add-destination-modal" class="add-destination-modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-xl font-bold text-gray-800">Add New Destination</h2>
+                <p class="text-gray-600 mt-1">Enter details for the new destination</p>
+            </div>
+            <div class="p-6">
+                <form id="destination-form">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Destination Name</label>
+                            <input id="dest-name" type="text" required class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                            <input id="dest-country" type="text" required class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Region</label>
+                            <input id="dest-region" type="text" class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Destination Type</label>
+                            <select id="dest-type" required class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-teal-500 focus:ring-2 focus:ring-teal-200">
+                                <option value="">Select Type</option>
+                                <option value="adventure">Adventure</option>
+                                <option value="beaches">Beaches</option>
+                                <option value="city">City</option>
+                                <option value="nature_beauty">Nature & Beauty</option>
+                                <option value="historical_and_cultural">Historical & Cultural</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Safety Rating</label>
+                            <input id="dest-safety" type="number" min="1" max="10" step="0.1" required class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Cost/Day ($)</label>
+                            <input id="dest-cost" type="number" min="0" required class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <textarea id="dest-description" rows="3" class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all"></textarea>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Best Time to Visit</label>
+                        <input id="dest-besttime" type="text" class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all">
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+                        <input id="dest-image" type="url" class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-all">
+                    </div>
+                </form>
+            </div>
+            <div class="flex flex-col md:flex-row justify-end p-6 border-t border-gray-200">
+                <button id="add-cancel" class="px-6 py-3 rounded-xl bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 mb-3 md:mb-0 md:mr-3">
+                    Cancel
+                </button>
+                <button id="add-submit" class="px-6 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-blue-600 text-white shadow-lg hover:shadow-xl transition-all">
+                    <i class="fas fa-plus mr-2"></i> Add Destination
+                </button>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Client-side integration with backend /api/destinations
+        let destinations = [];
+        let activeCollection = 'adventure';
+        let editMode = false;
+        let editTarget = null; // { id, collection }
+
+        const apiBase = '/api/destinations';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // initial fetch
+            await fetchAllDestinations();
+
+            // reuse many of the existing UI bindings
+            setupSidebarToggle();
+            setupCollectionTabs();
+            setupViewToggle();
+            setupModals();
+            setupRefresh();
+            setupGlobalSearch();
+        });
+
+        async function fetchAllDestinations() {
+            try {
+                const res = await fetch(apiBase, { credentials: 'same-origin' });
+                const json = await res.json();
+                if (!res.ok) throw new Error(json.message || 'Failed to fetch destinations');
+                destinations = json.data || [];
+                updateSidebarCounts();
+                renderDestinations(activeCollection);
+            } catch (err) {
+                console.error('Fetch error', err);
+                showToast('Could not load destinations from server', 'error');
+            }
+        }
+
+        function updateSidebarCounts() {
+            const tabs = document.querySelectorAll('.collection-tab');
+            tabs.forEach(tab => {
+                const coll = tab.dataset.collection;
+                const count = destinations.filter(d => d.collection === coll).length;
+                const badge = tab.querySelector('span:last-child');
+                if (badge) badge.textContent = count;
+            });
+            // Update total card (best effort)
+            const totalCard = document.querySelectorAll('.bg-gradient-to-br.from-teal-50.to-blue-50 .text-lg.font-bold')[0];
+            if (totalCard) totalCard.textContent = destinations.length;
+        }
+
+        function setupSidebarToggle() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            sidebarToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('sidebar-expanded');
+                sidebar.classList.toggle('sidebar-collapsed');
+                mainContent.classList.toggle('main-content-expanded');
+                mainContent.classList.toggle('main-content-collapsed');
+            });
+        }
+
+        function setupCollectionTabs() {
+            const collectionTabs = document.querySelectorAll('.collection-tab');
+            collectionTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    collectionTabs.forEach(t => t.classList.remove('active-tab'));
+                    tab.classList.add('active-tab');
+                    activeCollection = tab.dataset.collection;
+                    const titleMap = {
+                        'adventure': 'Adventure Destinations',
+                        'beaches': 'Beach Destinations',
+                        'city': 'City Destinations',
+                        'nature_beauty': 'Nature & Beauty Destinations',
+                        'historical_and_cultural': 'Historical & Cultural Destinations'
+                    };
+                    document.getElementById('collection-title').textContent = titleMap[activeCollection] || 'Destinations';
+                    renderDestinations(activeCollection);
+                });
+            });
+            // ensure one tab has active class
+            const active = document.querySelector('.collection-tab.active-tab') || document.querySelector('.collection-tab[data-collection="' + activeCollection + '"]');
+            if (active) active.classList.add('active-tab');
+        }
+
+        function setupViewToggle() {
+            const viewToggleGrid = document.getElementById('view-toggle-grid');
+            const viewToggleTable = document.getElementById('view-toggle-table');
+            const destinationsGrid = document.getElementById('destinations-grid');
+            const destinationsTable = document.getElementById('destinations-table');
+
+            viewToggleGrid.addEventListener('click', () => {
+                destinationsGrid.style.display = 'grid';
+                destinationsTable.style.display = 'none';
+            });
+            viewToggleTable.addEventListener('click', () => {
+                destinationsGrid.style.display = 'none';
+                destinationsTable.style.display = 'block';
+            });
+        }
+
+        function setupModals() {
+            const quickAdd = document.getElementById('quick-add');
+            const addDestination = document.getElementById('add-destination');
+            const fab = document.getElementById('fab');
+            const addDestinationModal = document.getElementById('add-destination-modal');
+            const addCancel = document.getElementById('add-cancel');
+            const addSubmit = document.getElementById('add-submit');
+            const destinationForm = document.getElementById('destination-form');
+
+            const openAddModal = (mode='create', payload=null) => {
+                editMode = (mode === 'edit');
+                editTarget = null;
+                if (editMode && payload) {
+                    // populate form with payload
+                    document.getElementById('dest-name').value = payload.name || '';
+                    document.getElementById('dest-country').value = payload.country || '';
+                    document.getElementById('dest-region').value = payload.region || '';
+                    document.getElementById('dest-type').value = payload.collection || payload.type || '';
+                    document.getElementById('dest-safety').value = payload.safety || payload.safety_rating || '';
+                    document.getElementById('dest-cost').value = payload.cost || payload.cost_per_day || '';
+                    document.getElementById('dest-description').value = payload.description || '';
+                    document.getElementById('dest-besttime').value = payload.best_time_to_visit || payload.bestTime || '';
+                    document.getElementById('dest-image').value = payload.image || '';
+                    editTarget = { id: payload.id ?? payload._id, collection: payload.collection };
+                } else {
+                    destinationForm.reset();
+                }
+                addDestinationModal.classList.remove('hidden');
+            };
+
+            quickAdd.addEventListener('click', () => openAddModal());
+            addDestination.addEventListener('click', () => openAddModal());
+            fab.addEventListener('click', () => openAddModal());
+
+            addCancel.addEventListener('click', () => {
+                document.getElementById('destination-form').reset();
+                addDestinationModal.classList.add('hidden');
+            });
+
+            addSubmit.addEventListener('click', async (e) => {
+                e.preventDefault();
+                // gather form data
+                const payload = {
+                    id: null,
+                    name: document.getElementById('dest-name').value.trim(),
+                    country: document.getElementById('dest-country').value.trim(),
+                    region: document.getElementById('dest-region').value.trim(),
+                    type: document.getElementById('dest-type').value,
+                    safety: parseFloat(document.getElementById('dest-safety').value) || null,
+                    cost: parseFloat(document.getElementById('dest-cost').value) || null,
+                    description: document.getElementById('dest-description').value.trim(),
+                    best_time_to_visit: document.getElementById('dest-besttime').value.trim(),
+                    image: document.getElementById('dest-image').value.trim()
+                };
+
+                if (!payload.name || !payload.country || !payload.type) {
+                    showToast('Please fill required fields: name, country and type', 'warning');
+                    return;
+                }
+
+                try {
+                    if (editMode && editTarget) {
+                        // Update
+                        const idToUpdate = editTarget.id;
+                        // ensure id is a number if possible
+                        const res = await fetch(`${apiBase}/${encodeURIComponent(idToUpdate)}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        const j = await res.json();
+                        if (!res.ok) throw new Error(j.message || 'Update failed');
+                        showToast('Destination updated', 'success');
+                    } else {
+                        // Create: generate id from max existing id
+                        payload.id = getNextId();
+                        const res = await fetch(apiBase, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ ...payload, type: payload.type })
+                        });
+                        const j = await res.json();
+                        if (!res.ok) throw new Error(j.message || 'Create failed');
+                        showToast('Destination created', 'success');
+                    }
+
+                    document.getElementById('destination-form').reset();
+                    document.getElementById('add-destination-modal').classList.add('hidden');
+                    await fetchAllDestinations();
+                } catch (err) {
+                    console.error(err);
+                    showToast(err.message || 'Operation failed', 'error');
+                }
+            });
+
+            // close when clicking outside
+            const addDestinationModalEl = document.getElementById('add-destination-modal');
+            addDestinationModalEl.addEventListener('click', (e) => {
+                if (e.target === addDestinationModalEl) addDestinationModalEl.classList.add('hidden');
+            });
+        }
+
+        function setupRefresh() {
+            const refreshBtn = document.getElementById('refresh-data');
+            refreshBtn.addEventListener('click', async () => {
+                await fetchAllDestinations();
+                gsap.to(refreshBtn, { rotation: 360, duration: 0.8, ease: 'power2.out' });
+            });
+        }
+
+        function setupGlobalSearch() {
+            const globalSearch = document.getElementById('global-search');
+            globalSearch.addEventListener('input', function() {
+                const term = this.value.trim().toLowerCase();
+                if (term.length > 2) {
+                    filterDestinations(activeCollection, term);
+                } else {
+                    renderDestinations(activeCollection);
+                }
+            });
+        }
+
+        function getNextId() {
+            const ids = destinations.map(d => Number(d.id)).filter(n => !Number.isNaN(n));
+            const max = ids.length ? Math.max(...ids) : 0;
+            return max + 1;
+        }
+
+        function mapField(dest, keys) {
+            for (const k of keys) if (dest[k] !== undefined) return dest[k];
+            return '';
+        }
+
+        function renderDestinations(collection) {
+            const gridContainer = document.getElementById('destinations-grid');
+            const tableBody = document.getElementById('table-body');
+            gridContainer.innerHTML = '';
+            tableBody.innerHTML = '';
+
+            const list = destinations.filter(d => d.collection === collection);
+
+            if (!list.length) {
+                const noResults = document.createElement('div');
+                noResults.className = 'col-span-full text-center py-10';
+                noResults.innerHTML = `
+                    <i class="fas fa-search text-4xl text-gray-300 mb-4"></i>
+                    <h3 class="text-lg font-medium text-gray-700">No destinations found</h3>
+                    <p class="text-gray-500 mt-1">Try adding a new destination or change collection</p>
+                `;
+                gridContainer.appendChild(noResults);
+                return;
+            }
+
+            list.forEach(destination => {
+                const row = createTableRow(destination);
+                tableBody.appendChild(row);
+                const card = createGridItem(destination);
+                gridContainer.appendChild(card);
+            });
+
+            gsap.from('.grid-item', { duration: 0.5, y: 30, opacity: 0, stagger: 0.05 });
+        }
+
+        function createGridItem(destination) {
+            const gridItem = document.createElement('div');
+            gridItem.className = 'grid-item bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 card-hover';
+            gridItem.style.gridRowEnd = 'span 40';
+
+            const typeLabel = mapField(destination, ['type', 'collection_label', 'category', 'collection']) || destination.collection || '';
+            const image = mapField(destination, ['image', 'photo', 'img']) || 'https://via.placeholder.com/800x480?text=No+Image';
+            const safety = mapField(destination, ['safety', 'safety_rating']) || '';
+            const cost = mapField(destination, ['cost', 'cost_per_day']) || '';
+            const best = mapField(destination, ['best_time_to_visit', 'bestTime']) || '';
+            const desc = mapField(destination, ['description', 'details']) || '';
+
+            gridItem.innerHTML = `
+                <div class="relative">
+                    <img src="${image}" alt="${destination.name || ''}" class="w-full h-48 object-cover" onerror="this.onerror=null;this.src='https://via.placeholder.com/800x480?text=No+Image'">
+                    <div class="absolute top-4 right-4 bg-gradient-to-r from-teal-500 to-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+                        ${typeLabel}
+                    </div>
+                </div>
+                <div class="p-5">
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="text-xl font-bold text-gray-800">${destination.name || ''}</h3>
+                        <div class="flex items-center bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full">
+                            <i class="fas fa-shield-alt mr-1"></i> ${safety}
+                        </div>
+                    </div>
+                    <p class="text-gray-600 mb-4">${desc}</p>
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <div class="text-sm text-gray-500">Country</div>
+                            <div class="font-medium">${destination.country || ''}</div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-500">Cost/Day</div>
+                            <div class="font-medium">${cost ? '$' + cost : '—'}</div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-500">Best Time</div>
+                            <div class="font-medium">${best}</div>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="edit-btn flex-1 py-2 bg-teal-50 text-teal-700 rounded-xl text-sm font-medium hover:bg-teal-100 transition-colors flex items-center justify-center" data-id="${destination.id ?? destination._id}">
+                            <i class="fas fa-edit mr-2"></i> Edit
+                        </button>
+                        <button class="delete-btn flex-1 py-2 bg-red-50 text-red-700 rounded-xl text-sm font-medium hover:bg-red-100 transition-colors flex items-center justify-center" data-id="${destination.id ?? destination._id}" data-coll="${destination.collection}">
+                            <i class="fas fa-trash-alt mr-2"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            gridItem.querySelector('.edit-btn').addEventListener('click', () => openEdit(destination));
+            gridItem.querySelector('.delete-btn').addEventListener('click', (e) => {
+                const id = e.currentTarget.dataset.id;
+                const coll = e.currentTarget.dataset.coll;
+                removeDestination(id, coll);
+            });
+
+            return gridItem;
+        }
+
+        function createTableRow(destination) {
+            const tr = document.createElement('tr');
+            tr.className = 'table-row-hover';
+            const image = mapField(destination, ['image', 'photo', 'img']) || 'https://via.placeholder.com/80';
+            const typeLabel = mapField(destination, ['type', 'collection_label', 'category', 'collection']) || destination.collection || '';
+            const safety = mapField(destination, ['safety', 'safety_rating']) || '';
+            const cost = mapField(destination, ['cost', 'cost_per_day']) || '';
+            const best = mapField(destination, ['best_time_to_visit', 'bestTime']) || '';
+
+            tr.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 h-10 w-10">
+                            <img class="h-10 w-10 rounded-full object-cover" src="${image}" alt="${destination.name || ''}" onerror="this.onerror=null;this.src='https://via.placeholder.com/80?text=No+Image'">
+                        </div>
+                        <div class="ml-4">
+                            <div class="text-sm font-medium text-gray-900">${destination.name || ''}</div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap"><div class="text-sm text-gray-900">${destination.country || ''}</div></td>
+                <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-teal-600 text-white">${typeLabel}</span></td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${safety}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${cost ? '$' + cost : '—'}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${best}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button class="edit-btn text-teal-600 hover:text-teal-900 mr-3" data-id="${destination.id ?? destination._id}">Edit</button>
+                    <button class="delete-btn text-red-600 hover:text-red-900" data-id="${destination.id ?? destination._id}" data-coll="${destination.collection}">Delete</button>
+                </td>
+            `;
+
+            tr.querySelector('.edit-btn').addEventListener('click', () => openEdit(destination));
+            tr.querySelector('.delete-btn').addEventListener('click', (e) => {
+                const id = e.currentTarget.dataset.id;
+                const coll = e.currentTarget.dataset.coll;
+                removeDestination(id, coll);
+            });
+
+            return tr;
+        }
+
+        function filterDestinations(collection, searchTerm) {
+            const filtered = destinations.filter(d => d.collection === collection && (
+                (d.name && d.name.toLowerCase().includes(searchTerm)) ||
+                (d.country && d.country.toLowerCase().includes(searchTerm)) ||
+                (d.description && d.description.toLowerCase().includes(searchTerm))
+            ));
+            const gridContainer = document.getElementById('destinations-grid');
+            const tableBody = document.getElementById('table-body');
+            gridContainer.innerHTML = '';
+            tableBody.innerHTML = '';
+            filtered.forEach(d => {
+                gridContainer.appendChild(createGridItem(d));
+                tableBody.appendChild(createTableRow(d));
+            });
+            if (!filtered.length) {
+                const noResults = document.createElement('div');
+                noResults.className = 'col-span-full text-center py-10';
+                noResults.innerHTML = `
+                    <i class="fas fa-search text-4xl text-gray-300 mb-4"></i>
+                    <h3 class="text-lg font-medium text-gray-700">No destinations found</h3>
+                `;
+                gridContainer.appendChild(noResults);
+            }
+        }
+
+        function openEdit(destination) {
+            // open modal with data
+            const data = {
+                id: destination.id ?? destination._id,
+                name: destination.name,
+                country: destination.country,
+                region: destination.region,
+                collection: destination.collection,
+                type: destination.type,
+                safety: destination.safety || destination.safety_rating,
+                cost: destination.cost || destination.cost_per_day,
+                description: destination.description,
+                best_time_to_visit: destination.best_time_to_visit,
+                image: destination.image
+            };
+            editMode = true;
+            editTarget = { id: data.id, collection: data.collection };
+            document.getElementById('add-destination-modal').classList.remove('hidden');
+            // populate form
+            document.getElementById('dest-name').value = data.name || '';
+            document.getElementById('dest-country').value = data.country || '';
+            document.getElementById('dest-region').value = data.region || '';
+            document.getElementById('dest-type').value = data.collection || data.type || '';
+            document.getElementById('dest-safety').value = data.safety || '';
+            document.getElementById('dest-cost').value = data.cost || '';
+            document.getElementById('dest-description').value = data.description || '';
+            document.getElementById('dest-besttime').value = data.best_time_to_visit || '';
+            document.getElementById('dest-image').value = data.image || '';
+        }
+
+        async function removeDestination(id, collection) {
+            if (!confirm('Are you sure you want to delete this destination?')) return;
+            try {
+                const url = `${apiBase}/${encodeURIComponent(id)}${collection ? ('?type=' + encodeURIComponent(collection)) : ''}`;
+                const res = await fetch(url, { method: 'DELETE' });
+                const j = await res.json();
+                if (!res.ok) throw new Error(j.message || 'Delete failed');
+                showToast('Destination deleted', 'success');
+                await fetchAllDestinations();
+            } catch (err) {
+                console.error(err);
+                showToast(err.message || 'Delete failed', 'error');
+            }
+        }
+
+        // small toast helper
+        function showToast(message, type='info') {
+            // minimal: use alert for now, but non-blocking
+            // create a small toast element
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-6 left-6 z-50 px-4 py-2 rounded shadow-lg text-white';
+            toast.style.background = type === 'error' ? '#ef4444' : (type === 'success' ? '#10b981' : '#0ea5a4');
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; }, 2500);
+            setTimeout(() => { toast.remove(); }, 3000);
+        }
+    </script>
+</body>
+</html>
