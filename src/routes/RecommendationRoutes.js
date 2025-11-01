@@ -1,6 +1,6 @@
 // routes/recommendationRoutes.js
 import express from "express";
-import Authenticate from "../middlewares/authenticate.middleware.js";
+import Authenticate from "../middlewares/authenticateMiddleware.js";
 import { recommendDestinations } from "../controllers/RecommendationController.js";
 
 const router = express.Router();

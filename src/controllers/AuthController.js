@@ -1,5 +1,5 @@
 // HYBRID JWT AUTH (ACCESS + REFRESH TOKEN STORED IN DB)
-import User from '../models/User.Models.js';
+import User from '../models/UserModels.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';

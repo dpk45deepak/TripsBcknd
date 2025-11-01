@@ -1,6 +1,6 @@
 import express from "express";
-import Authenticate from "../middlewares/authenticate.middleware.js";
-import verifyDbAdmin from "../middlewares/dbAdmin.middleware.js";
+import Authenticate from "../middlewares/authenticateMiddleware.js";
+import verifyDbAdmin from "../middlewares/dbAdminMiddleware.js";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
 

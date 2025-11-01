@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import destinationSchema from "./Destination.Models.js";
+import destinationSchema from "./DestinationModels.js";
 
 
 export const Adventure = mongoose.model("Adventure", destinationSchema, "adventure");

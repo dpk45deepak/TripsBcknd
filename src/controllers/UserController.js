@@ -1,4 +1,4 @@
-import User from '../models/User.Models.js';
+import User from '../models/UserModels.js';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';

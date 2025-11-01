@@ -1,5 +1,5 @@
 // controllers/RecommendationController.js
-import User from "../models/User.Models.js";
+import User from "../models/UserModels.js";
 import { Adventure, Beaches, City, NatureBeauty, HistoricalAndCultural } from "../models/index.js";
 
 /**

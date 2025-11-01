@@ -9,7 +9,7 @@ import {
     GetDestinations,
     GetDestinationsByType
 } from "../controllers/DestinationController.js";
-import Authenticate from "../middlewares/authenticate.middleware.js";
+import Authenticate from "../middlewares/authenticateMiddleware.js";
 
 
 const router = express.Router();

@@ -1,5 +1,5 @@
 import express from "express";
-import Authenticate from "../middlewares/authenticate.middleware.js";
+import Authenticate from "../middlewares/authenticateMiddleware.js";
 import {
     updateUserProfile,
     setFavouriteCategories,
