@@ -11,7 +11,7 @@ import { fileURLToPath } from "url";
 // Routes imports
 import authRouter from "./src/routes/Auth.Routes.js";
 import userRouter from "./src/routes/User.Routes.js";
-import destinationRouter from "./src/routes/Destination.Routes.js";
+import destinationRouter from "./src/routes/Destination.routes.js";
 import recommendationRouter from "./src/routes/Recommendation.Routes.js";
 import viewsRouter from "./src/routes/Views.Routes.js";
 
