@@ -9,11 +9,11 @@ import path, { dirname } from "path";
 import { fileURLToPath } from "url";
 
 // Routes imports
-import authRouter from "./src/routes/Auth.routes.js";
-import userRouter from "./src/routes/User.routes.js";
-import destinationRouter from "./src/routes/Destination.routes.js";
-import recommendationRouter from "./src/routes/Recommendation.routes.js";
-import viewsRouter from "./src/routes/Views.routes.js";
+import authRouter from "./src/routes/AuthRoutes.js";
+import userRouter from "./src/routes/UserRoutes.js";
+import destinationRouter from "./src/routes/DestinationRoutes.js";
+import recommendationRouter from "./src/routes/RecommendationRoutes.js";
+import viewsRouter from "./src/routes/ViewsRoutes.js";
 
 dotenv.config();
 
