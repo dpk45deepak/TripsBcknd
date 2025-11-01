@@ -3,11 +3,8 @@ import bcrypt from 'bcrypt';
 
 const userSchema = new mongoose.Schema(
   {
-    // 🔹 Existing fields
     username: {
       type: String,
-      required: true,
-      unique: true,
       trim: true,
       minlength: 3,
     },
@@ -20,6 +17,7 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
+      required: true,
       minlength: 7,
     },
     location: {
@@ -32,8 +30,8 @@ const userSchema = new mongoose.Schema(
     },
     history: [
       {
+        id: String,
         type: String,
-        id: true,
       },
     ],
     favoriteCategories: {
@@ -42,7 +40,7 @@ const userSchema = new mongoose.Schema(
         climatePreference: { type: [String], default: [] },
         activities: { type: [String], default: [] },
         duration: { type: String, default: "Weekend" },
-        budget: { type: Number, default: 0 },
+        budget: { type: String, default: "Under 50k" },
       }
     },
     tokens: [
@@ -50,11 +48,10 @@ const userSchema = new mongoose.Schema(
         refreshToken: { type: String },
       },
     ],
-    // 🔹 Google OAuth specific fields
     googleId: {
       type: String,
       unique: true,
-      sparse: true, // allow multiple nulls
+      sparse: true,
     },
     profilePic: {
       type: String,
@@ -96,7 +93,12 @@ const userSchema = new mongoose.Schema(
     bio: {
       type: String,
       default: 'Travel enthusiast!',
-    }
+    },
+    role: {
+      type: String,
+      enum: ['user', 'admin', 'dbAdmin'],
+      default: 'user',
+    },
   },
   { timestamps: true }
 );

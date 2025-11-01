@@ -1,4 +1,3 @@
-// Express Server imports
 import express from "express";
 import session from "express-session";
 import cookieParser from "cookie-parser";
@@ -9,10 +8,12 @@ import morgan from "morgan";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
 
-// Routes imports`
-import userRouter from "./src/routes/UserRoutes.js";
-import destinationRouter from "./src/routes/Destination.routes.js";
-import recommendationRouter from "./src/routes/Recommendation.routes.js";
+// Routes imports
+import authRouter from "./src/routes/Auth.Routes.js";
+import userRouter from "./src/routes/User.Routes.js";
+import destinationRouter from "./src/routes/Destination.Routes.js";
+import recommendationRouter from "./src/routes/Recommendation.Routes.js";
+import viewsRouter from "./src/routes/Views.Routes.js";
 
 dotenv.config();
 
@@ -25,16 +26,16 @@ const app = express();
 // Allowed frontend origin
 const allowedOrigin = process.env.CORS_ORIGIN || "http://localhost:5173";
 
-// ⚙️ Rate limiter
+// Rate limiter
 const apiLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 400,
+  max: 500,
   message: "Too many requests from this IP, please try again after an hour!",
   standardHeaders: true,
   legacyHeaders: false,
 });
 
-// ⚙️ CORS setup
+// CORS setup
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -51,18 +52,18 @@ app.use(
 // Logging
 app.use(morgan("dev"));
 
-// ⚙️ Static & view setup
+// Static & view setup
 app.use(express.static(path.join(__dirname, "public")));
 // set views to the local `views` folder (was incorrectly using parent dir)
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
-// ⚙️ Body parsing
+// Body parsing
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(cookieParser());
 
-// ⚙️ Session setup (must come before passport.session)
+// Session setup (must come before passport.session)
 app.use(
   session({
     secret: process.env.GOOGLE_SESSION_SECRET || "supersecret",
@@ -72,35 +73,25 @@ app.use(
   })
 );
 
+// Trust proxy (if behind a proxy like Nginx or in production)
+if (process.env.NODE_ENV === 'production') app.set('trust proxy', 1);
 
-// 🧩 Base route - render view with fallback to static index.html
-app.get("/", (req, res) => {
-  res.render("index", {}, (err, html) => {
-    if (err) {
-      // fallback to public/index.html if view not found or render fails
-      return res.sendFile(path.join(__dirname, "public", "index.html"));
-    }
-    res.send(html);
-  });
-});
 
-app.get("/auth", (req, res) => {
-  res.render("Auth");
-})
-
-app.get("/dashboard", (req, res) => {
-  res.render("Dashboard");
-})
-
-// 🧩 Ping route
+// Ping endpoint
 app.get("/api", (req, res) => {
   res.json({ msg: "Hello Developer! Backend is running smoothly..!!" });
 });
 
-// 🧩 Apply rate limiter to all /api routes
+
+// Mount DB / EJS routes via router (moved rendering logic into router)
+app.use("/", viewsRouter);
+
+// Default API routes
+// Apply rate limiter to all /api routes
 app.use("/api", apiLimiter);
 
-// 🧩 Routes
+// Backend Routes
+app.use("/api/auth", authRouter);
 app.use("/api/users", userRouter);
 app.use("/api/destinations", destinationRouter);
 app.use("/api/recommendations", recommendationRouter);

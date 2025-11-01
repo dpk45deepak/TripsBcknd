@@ -1,5 +1,5 @@
 // controllers/RecommendationController.js
-import User from "../models/user.models.js";
+import User from "../models/User.Models.js";
 import { Adventure, Beaches, City, NatureBeauty, HistoricalAndCultural } from "../models/index.js";
 
 /**
@@ -8,9 +8,9 @@ import { Adventure, Beaches, City, NatureBeauty, HistoricalAndCultural } from ".
 const collectionMap = {
     adventure: Adventure,
     beaches: Beaches,
-    city: City,
-    nature_beauty: NatureBeauty,
-    historical_and_cultural: HistoricalAndCultural,
+    city: "Cities",
+    nature_beauty: "Nature's Beauty",
+    historical_and_cultural: "Historical and Cultural",
 };
 
 /**
@@ -19,7 +19,8 @@ const collectionMap = {
  */
 export const recommendDestinations = async (req, res) => {
     try {
-        const { userId, param1, param2 } = req.params;
+        const userId = req.user._id;
+        const { param1, param2 } = req.params;
 
         // 🔹 Step 1: Fetch user & their favorite categories
         const user = await User.findById(userId);
