@@ -1,5 +1,6 @@
 import express from "express";
 import passport from "../config/passport.js";
+import dotenv from "dotenv";
 import Authenticate from "../middlewares/authenticateMiddleware.js";
 import {
     registerUser,
@@ -11,6 +12,7 @@ import {
 } from "../controllers/AuthController.js";
 
 const router = express.Router();
+dotenv.config();
 
 // Register a new user
 router.post("/register", (req, res, next) => {
@@ -46,7 +48,7 @@ router.get(
     passport.authenticate("google", { failureRedirect: "/login", session: false }),
     (req, res) => {
         // ✅ Redirect to your frontend dashboard or home
-        res.redirect("http://localhost:5173/home");
+        res.redirect(`${process.env.FRONTEND_URL}/home`); // Adjust as needed
     }
 );
 
