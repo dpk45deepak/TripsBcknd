@@ -3,6 +3,7 @@ import User from '../models/UserModels.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import generateTokens from "../utils/generateTokens.js";
 
 dotenv.config();
 
@@ -12,20 +13,6 @@ const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 if (!ACCESS_SECRET || !REFRESH_SECRET) {
     throw new Error('JWT secrets are not configured');
 }
-
-const generateTokens = (user) => {
-    const accessToken = jwt.sign(
-        { userId: user._id, username: user.username, email: user.email, role: user.role },
-        ACCESS_SECRET,
-        { expiresIn: '30d' }
-    );
-    const refreshToken = jwt.sign(
-        { userId: user._id, username: user.username, email: user.email, role: user.role },
-        REFRESH_SECRET,
-        { expiresIn: '45d' }
-    );
-    return { accessToken, refreshToken };
-};
 
 
 export const registerUser = async (req, res) => {
@@ -54,7 +41,7 @@ export const registerUser = async (req, res) => {
         });
 
         const tokens = generateTokens(newUser);
-        newUser.tokens.push({ refreshToken: tokens.refreshToken });
+        newUser.tokens = [{ refreshToken: tokens.refreshToken }]; // Replace entire tokens array with single new token
 
         await newUser.save();
         console.log(`New user registered with email: ${newUser.email}`); // Debugging line
@@ -93,27 +80,33 @@ export const registerUser = async (req, res) => {
 export const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
-        // Input validation
-        switch (true) {
-            case !email:
-                return res.status(400).json({ msg: 'Email is required' });
-            case !password:
-                return res.status(400).json({ msg: 'Password is required' });
-        }
 
-        // Find user
+        // 🔹 Input validation
+        if (!email) return res.status(400).json({ msg: 'Email is required' });
+        if (!password) return res.status(400).json({ msg: 'Password is required' });
+
+        // 🔹 Find user by email
         const user = await User.findOne({ email });
-        console.log(`user: ${user.username} with email: ${user.email} is trying to login with password: ${password}`); // Debugging line
-
-        if (!user || !(await bcrypt.compare(password, user.password))) {
-            return res.status(401).json({ msg: 'User not found, invalid credentials' });
+        if (!user) {
+            return res.status(401).json({ status: 441, msg: 'User not found, invalid credentials' });
         }
 
+        // 🔹 Validate password
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ status: 441, msg: 'Invalid credentials' });
+        }
+
+        console.log(`🟢 User "${user.username}" with email "${user.email}" logged in.`);
+
+        // 🔹 Generate tokens
         const tokens = generateTokens(user);
-        user.tokens.push({ refreshToken: tokens.refreshToken });
+
+        // Store refresh token in DB (replace old tokens)
+        user.tokens = [{ refreshToken: tokens.refreshToken }];
         await user.save();
 
-        // Set both tokens in cookies
+        // 🔹 Set cookies
         res.cookie("refreshToken", tokens.refreshToken, {
             httpOnly: true,
             secure: true,
@@ -128,20 +121,27 @@ export const loginUser = async (req, res) => {
             maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
         });
 
+        // 🔹 Send success response
         return res.status(200).json({
-            msg: 'Login Completed Successfully!!',
+            msg: 'Login completed successfully!',
             user: {
                 id: user._id,
                 username: user.username,
                 email: user.email,
                 role: user.role,
-            }
+            },
         });
     } catch (error) {
-        console.error('Login Controller error:', error);
+        console.error('❌ Login error:', error.message);
+
+        if (error.message.toString() === 'data and hash arguments required') {
+            return res.status(501).json({ msg: 'Use Google to login.' });
+        }
+
         return res.status(500).json({ msg: 'Internal server error' });
     }
 };
+
 
 export const refreshAccessToken = async (req, res) => {
     try {
@@ -158,7 +158,7 @@ export const refreshAccessToken = async (req, res) => {
         // Generate new access token
         const newTokens = generateTokens(user);
         // Update refresh token in DB
-        user.tokens = newTokens.refreshToken;
+        user.tokens = [{ refreshToken: newTokens.refreshToken }]; // Store as array with single token object
         await user.save();
 
         // Set both tokens in cookies
@@ -240,3 +240,18 @@ export const logOut = async (req, res) => {
 
 // TODO: Add Social SignUp / Login controllers later
 // e.g., Google OAuth, Facebook Login, etc.
+
+
+export const googleCallback = (req, res) => {
+    const user = req.user;
+    res.status(200).json({
+        success: true,
+        message: "Google OAuth successful",
+    });
+};
+
+export const logoutUser = (req, res) => {
+    req.logout(() => {
+        res.status(200).json({ success: true, message: "Logged out successfully" });
+    });
+};

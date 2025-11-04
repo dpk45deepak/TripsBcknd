@@ -16,7 +16,7 @@ if (!ACCESS_SECRET || !REFRESH_SECRET || !EMAIL_VERIFICATION_SECRET) {
 // Get user profile controller
 export const getUserProfile = async (req, res) => {
   try {
-    const user = await User.findOne({ _id: req.user.userId }).select('-password -tokens');
+    const user = await User.findOne({ _id: req.user._id }).select('-password -tokens');
     if (!user) {
       return res.status(404).json({ msg: 'User not found' });
     }
@@ -33,7 +33,7 @@ export const getUserProfile = async (req, res) => {
 
 export const setFavouriteCategories = async (req, res) => {
   try {
-    const userId = req.params.userId || req.params.id || req.body.userId || req.user?._id;
+    const userId = req.user?._id;
     if (!userId) {
       return res.status(400).json({ msg: "userId is required (route param :userId/:id, body.userId or authenticated user)" });
     }
@@ -79,13 +79,15 @@ export const setFavouriteCategories = async (req, res) => {
       "city",
       "cities",
       "nature's beauty",
-      "historical_and_cultural",
+      "historical",
       "forests",
       "deserts",
       "mountains",
       "islands",
       "rivers",
       "lakes",
+      "cultural",
+      "wildlife",
     ]);
 
     const updateDoc = {};
@@ -139,6 +141,7 @@ export const setFavouriteCategories = async (req, res) => {
     if (!updatedUser) return res.status(404).json({ msg: "User not found" });
 
     return res.status(200).json({
+      status: 200,
       msg: "Favourite preferences updated successfully",
       user: updatedUser,
     });
@@ -150,26 +153,20 @@ export const setFavouriteCategories = async (req, res) => {
   }
 };
 
-const ALLOWED_FIELDS = [
-  "username", "bio", "email",
-  "location", "budget", "themePreference",
-  "notificationsEnabled", "newslettersEnabled",
-  "dateOfBirth", "phone",  "website",
-  ];
-
 export const updateUserProfile = async (req, res) => {
   try {
-    // 1. Validate userId source
+    // 1️⃣ Get logged-in userId
     const userId = req.user?._id;
     console.log("Updating profile for userId:", userId);
+
     if (!userId) {
       return res.status(400).json({
         success: false,
-        msg: "userId is required in route params or body.",
+        msg: "User ID not found in request.",
       });
     }
 
-    // 2. Validate ObjectId
+    // 2️⃣ Validate ObjectId format
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({
         success: false,
@@ -177,23 +174,38 @@ export const updateUserProfile = async (req, res) => {
       });
     }
 
-    // 3. Validate and sanitize update data
+    // 3️⃣ Define allowed fields (you can move this to a constants file)
+    const ALLOWED_FIELDS = [
+      "username", "bio", "email",
+      "location", "budget", "themePreference",
+      "notificationsEnabled", "newslettersEnabled",
+      "dateOfBirth", "phone", "website",
+    ];
+
+    // 4️⃣ Build the update object dynamically
     const updates = {};
-    for (const key of Object.keys(req.body)) {
+    const invalidFields = [];
+
+    for (const [key, value] of Object.entries(req.body)) {
       if (ALLOWED_FIELDS.includes(key)) {
-          updates[key] = req.body[key];
+        updates[key] = value;
+      } else {
+        invalidFields.push(key);
       }
     }
 
-    // Prevent empty update requests
+    // 5️⃣ Prevent empty or invalid update requests
     if (Object.keys(updates).length === 0) {
       return res.status(400).json({
         success: false,
-        msg: "No valid fields provided for update.",
+        msg:
+          invalidFields.length > 0
+            ? `Invalid fields: ${invalidFields.join(", ")}`
+            : "No valid fields provided for update.",
       });
     }
 
-    // 4. Validate specific fields manually (optional, extend as needed)
+    // 6️⃣ Extra field-level validation (optional)
     if (updates.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(updates.email)) {
       return res.status(400).json({
         success: false,
@@ -201,14 +213,14 @@ export const updateUserProfile = async (req, res) => {
       });
     }
 
-    // 5. Update user safely
+    // 7️⃣ Perform update
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { $set: updates },
       {
         new: true,
         runValidators: true,
-        select: "-password -tokens", // never expose
+        select: "-password -tokens", // never expose sensitive data
       }
     );
 
@@ -219,30 +231,31 @@ export const updateUserProfile = async (req, res) => {
       });
     }
 
-    // 6. Success Response
+    // 8️⃣ Success response
     return res.status(200).json({
       success: true,
       msg: "User profile updated successfully.",
+      updatedFields: Object.keys(updates),
       user: updatedUser,
     });
   } catch (error) {
-    console.error("Error updating user profile:", error);
+    console.error("❌ Error updating user profile:", error);
 
-    // 7. Handle known errors cleanly
     if (error.name === "CastError") {
       return res.status(400).json({ success: false, msg: "Invalid userId." });
     }
+
     if (error.name === "ValidationError") {
-      return res.status(400).json({ success: false, msg: error.msg });
+      return res.status(400).json({ success: false, msg: error.message });
     }
 
-    // 8. Fallback for unexpected errors
     return res.status(500).json({
       success: false,
       msg: "Internal server error.",
     });
   }
 };
+
 
 // Verify email controller
 
@@ -291,6 +304,43 @@ export const verifyEmail = async (req, res) => {
   } catch (error) {
     console.error("Email verification error:", error);
     return res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const deleteUser = async (req, res) => {
+  try {
+    // ✅ Authenticated user ki ID (req.user me aayegi after login)
+    const userId = req.user?._id;
+
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    // ✅ Delete user from DB
+    const deletedUser = await User.findByIdAndDelete(userId);
+
+    if (!deletedUser) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // ✅ Logout user (destroy session)
+    req.logout((err) => {
+      if (err) console.error("Logout error:", err);
+    });
+    req.session.destroy();
+
+    res.clearCookie("connect.sid"); // Session cookie delete
+
+    return res.status(200).json({
+      success: true,
+      message: "User account deleted successfully!",
+    });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error. Could not delete user.",
+    });
   }
 };
 

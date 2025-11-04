@@ -42,4 +42,4 @@ return res.status(401).json({ msg: 'Invalid token!!' });
   }
 };
 
-export default Authenticate;
+  export default Authenticate;

@@ -1,9 +1,11 @@
 import express from "express";
-import Authenticate from "../middlewares/authenticateMiddleware.js";
+import Authenticate  from "../middlewares/authenticateMiddleware.js";
+import isAuthenticate from "../middlewares/isAuthenticatedMiddleware.js";
 import {
     updateUserProfile,
     setFavouriteCategories,
     getUserProfile,
+    deleteUser,
     verifyEmail
 } from "../controllers/UserController.js";
 
@@ -29,6 +31,12 @@ router.post("/:userId/update-profile", Authenticate, (req, res, next) => {
 router.put("/:userId/favourite-categories", Authenticate, (req, res, next) => {
     console.log("[ROUTE] PUT /users/:userId/favourite-categories");
     setFavouriteCategories(req, res, next);
+});
+
+// Delete user account
+router.delete("/delete", isAuthenticate, (req, res, next) => {
+    console.log("[ROUTE] DELETE /users/:userId");
+    deleteUser(req, res, next);
 });
 
 export default router;

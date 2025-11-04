@@ -8,7 +8,11 @@ import morgan from "morgan";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
 
-// Routes imports
+// 🧠 Import database connection and passport config
+import connectDB from "./src/DBConfig/DBconfig.js";
+import passport from "./src/config/passport.js"; // this imports configured passport (only once)
+
+// 🧩 Import routes
 import authRouter from "./src/routes/AuthRoutes.js";
 import userRouter from "./src/routes/UserRoutes.js";
 import destinationRouter from "./src/routes/DestinationRoutes.js";
@@ -17,16 +21,19 @@ import viewsRouter from "./src/routes/ViewsRoutes.js";
 
 dotenv.config();
 
-// Handling __dirname in ES modules
+// 🛠 Handle __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
 
-// Allowed frontend origin
+// ✅ Connect to MongoDB
+connectDB();
+
+// 🌐 Allowed frontend origin
 const allowedOrigin = process.env.CORS_ORIGIN || "http://localhost:5173";
 
-// Rate limiter
+// 🧱 Rate limiter
 const apiLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 500,
@@ -35,7 +42,7 @@ const apiLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// CORS setup
+// 🔒 CORS setup
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -45,53 +52,57 @@ app.use(
       return callback(new Error("Not allowed by CORS"));
     },
     methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true, // allows sending cookies/sessions
+    credentials: true, // allows cookies/sessions
   })
 );
 
-// Logging
+// 🪵 Logging
 app.use(morgan("dev"));
 
-// Static & view setup
+// 🖼 Static & view setup
 app.use(express.static(path.join(__dirname, "public")));
-// set views to the local `views` folder (was incorrectly using parent dir)
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
-// Body parsing
+// 📦 Body parsing
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(cookieParser());
 
-// Session setup (must come before passport.session)
+// 🧁 Session setup (must come BEFORE passport.session)
 app.use(
   session({
-    secret: process.env.GOOGLE_SESSION_SECRET || "supersecret",
+    secret: process.env.SESSION_SECRET || "supersecret",
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false }, // true for HTTPS
+    cookie: {
+      secure: process.env.NODE_ENV === "production", // true for HTTPS
+      httpOnly: true,
+      sameSite: "lax",
+    },
   })
 );
 
-// Trust proxy (if behind a proxy like Nginx or in production)
-if (process.env.NODE_ENV === 'production') app.set('trust proxy', 1);
+// 🛰 Trust proxy (for production)
+if (process.env.NODE_ENV === "production") app.set("trust proxy", 1);
 
+// 🔐 Initialize Passport (Google OAuth)
+app.use(passport.initialize());
+app.use(passport.session());
 
-// Ping endpoint
+// ✅ Basic Health Check Route
 app.get("/api", (req, res) => {
-  res.json({ msg: "Hello Developer! Backend is running smoothly..!!" });
+  res.json({ msg: "✅ Backend running smoothly with Google OAuth integration!" });
 });
 
-
-// Mount DB / EJS routes via router (moved rendering logic into router)
+// 🧭 EJS routes
 app.use("/", viewsRouter);
 
-// Default API routes
-// Apply rate limiter to all /api routes
+// ⏳ Apply rate limiter to all /api routes
 app.use("/api", apiLimiter);
 
-// Backend Routes
-app.use("/api/auth", authRouter);
+// 🚀 Main API Routes
+app.use("/api/auth", authRouter); // Google OAuth routes included here
 app.use("/api/users", userRouter);
 app.use("/api/destinations", destinationRouter);
 app.use("/api/recommendations", recommendationRouter);
