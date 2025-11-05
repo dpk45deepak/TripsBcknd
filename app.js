@@ -31,7 +31,7 @@ const app = express();
 connectDB();
 
 // 🌐 Allowed frontend origin
-const allowedOrigin = process.env.CORS_ORIGIN || "http://localhost:5173" || "https://tripmate-dpk.netlify.app/";
+const allowedOrigin = process.env.CORS_ORIGIN || "http://localhost:5173" || "https://tripmate-dpk.netlify.app";
 
 // 🧱 Rate limiter
 const apiLimiter = rateLimit({
