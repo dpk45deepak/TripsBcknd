@@ -16,7 +16,18 @@ const router = express.Router();
 
 // Create and Get all
 router.post("/", Authenticate, CreateDestination);
-router.get("/", Authenticate, GetDestinations);
+// router.get("/", Authenticate, GetDestinations);
+
+
+
+
+
+// for few days for testing purpose making it public
+router.get("/", GetDestinations);
+
+
+
+
 
 // Filter and best-time endpoints (by collection type)
 router.get("/:type/filter", Authenticate, getDestinationsByFilter);
