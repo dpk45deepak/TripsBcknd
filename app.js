@@ -31,7 +31,7 @@ const app = express();
 connectDB();
 
 // 🌐 Allowed frontend origin
-const allowedOrigin = process.env.CORS_ORIGIN || "http://localhost:5173" || "https://tripmate-dpk.netlify.app";
+const allowedOrigin = process.env.CORS_ORIGIN;
 
 // 🧱 Rate limiter
 const apiLimiter = rateLimit({
@@ -48,13 +48,16 @@ app.use(
     origin: function (origin, callback) {
       if (!origin || origin === allowedOrigin || origin.startsWith(allowedOrigin)) {
         return callback(null, true);
+      } else {
+        console.error(`🚫 Origin not allowed: ${origin}`);
+        return callback(new Error("Origin not allowed"));
       }
-      return callback(new Error("Not allowed by CORS"));
     },
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true, // allows cookies/sessions
   })
 );
+
 
 // 🪵 Logging
 app.use(morgan("dev"));
@@ -86,22 +89,22 @@ app.use(
 // 🛰 Trust proxy (for production)
 if (process.env.NODE_ENV === "production") app.set("trust proxy", 1);
 
-// 🔐 Initialize Passport (Google OAuth)
+// Initialize Passport (Google OAuth)
 app.use(passport.initialize());
 app.use(passport.session());
 
 // ✅ Basic Health Check Route
 app.get("/api", (req, res) => {
-  res.json({ msg: "✅ Backend running smoothly with Google OAuth integration!" });
+  res.json({ msg: "Backend running smoothly!! ✅ " });
 });
 
-// 🧭 EJS routes
+// EJS routes
 app.use("/", viewsRouter);
 
-// ⏳ Apply rate limiter to all /api routes
+// Apply rate limiter to all /api routes
 app.use("/api", apiLimiter);
 
-// 🚀 Main API Routes
+// Main API Routes
 app.use("/api/auth", authRouter); // Google OAuth routes included here
 app.use("/api/users", userRouter);
 app.use("/api/destinations", destinationRouter);

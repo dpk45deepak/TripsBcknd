@@ -26,7 +26,7 @@ router.post("/:userId/update-profile", Authenticate, (req, res, next) => {
     console.log("[ROUTE] POST /users/:userId/update-profile");
     updateUserProfile(req, res, next);
 });
-
+``
 // Set or update user's favourite categories
 router.put("/:userId/favourite-categories", Authenticate, (req, res, next) => {
     console.log("[ROUTE] PUT /users/:userId/favourite-categories");
