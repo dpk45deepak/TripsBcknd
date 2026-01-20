@@ -98,6 +98,10 @@ app.get("/api", (req, res) => {
   res.json({ msg: "Backend running smoothly!! ✅ " });
 });
 
+app.get("/health", (req, res) => {
+  res.status(200).send("OK");
+});
+
 // EJS routes
 app.use("/", viewsRouter);
 
