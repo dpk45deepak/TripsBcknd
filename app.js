@@ -8,11 +8,11 @@ import morgan from "morgan";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
 
-// 🧠 Import database connection and passport config
+// Import database connection and passport config
 import connectDB from "./src/DBConfig/DBconfig.js";
-import passport from "./src/config/passport.js"; // this imports configured passport (only once)
+import passport from "./src/config/passport.js";
 
-// 🧩 Import routes
+// Import routes
 import authRouter from "./src/routes/AuthRoutes.js";
 import userRouter from "./src/routes/UserRoutes.js";
 import destinationRouter from "./src/routes/DestinationRoutes.js";
@@ -21,17 +21,17 @@ import viewsRouter from "./src/routes/ViewsRoutes.js";
 
 dotenv.config();
 
-// 🛠 Handle __dirname in ES modules
+// Handle __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
 
-// ✅ Connect to MongoDB
+// Connect to MongoDB ✅
 connectDB();
 
 // 🌐 Allowed frontend origin
-const allowedOrigin = process.env.CORS_ORIGIN;
+const allowedOrigin = process.env.CORS_ORIGIN || "http://localhost:5173";
 
 // 🧱 Rate limiter
 const apiLimiter = rateLimit({
@@ -49,7 +49,7 @@ app.use(
       if (!origin || origin === allowedOrigin || origin.startsWith(allowedOrigin)) {
         return callback(null, true);
       } else {
-        console.error(`🚫 Origin not allowed: ${origin}`);
+        console.error(`Origin not allowed: ${origin} !== ${allowedOrigin}`);
         return callback(new Error("Origin not allowed"));
       }
     },
@@ -59,10 +59,10 @@ app.use(
 );
 
 
-// 🪵 Logging
+// 📦 Logging
 app.use(morgan("dev"));
 
-// 🖼 Static & view setup
+// 📦 Static & view setup
 app.use(express.static(path.join(__dirname, "public")));
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
@@ -72,7 +72,7 @@ app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(cookieParser());
 
-// 🧁 Session setup (must come BEFORE passport.session)
+// 📦 Session setup (must come BEFORE passport.session)
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "supersecret",
@@ -86,14 +86,14 @@ app.use(
   })
 );
 
-// 🛰 Trust proxy (for production)
+// Trust proxy (for production)
 if (process.env.NODE_ENV === "production") app.set("trust proxy", 1);
 
 // Initialize Passport (Google OAuth)
 app.use(passport.initialize());
 app.use(passport.session());
 
-// ✅ Basic Health Check Route
+// Basic Health Check Route
 app.get("/api", (req, res) => {
   res.json({ msg: "Backend running smoothly!! ✅ " });
 });
