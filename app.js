@@ -18,6 +18,7 @@ import userRouter from "./src/routes/UserRoutes.js";
 import destinationRouter from "./src/routes/DestinationRoutes.js";
 import recommendationRouter from "./src/routes/RecommendationRoutes.js";
 import viewsRouter from "./src/routes/ViewsRoutes.js";
+import MemoriesRoutes from "./src/routes/MemoriesRoutes.js";
 
 dotenv.config();
 
@@ -116,5 +117,6 @@ app.use("/api/auth", authRouter); // Google OAuth routes included here
 app.use("/api/users", userRouter);
 app.use("/api/destinations", destinationRouter);
 app.use("/api/recommendations", recommendationRouter);
+app.use("/api/memories", MemoriesRoutes);
 
 export default app;
