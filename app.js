@@ -31,11 +31,13 @@ const app = express();
 connectDB();
 
 // 🌐 Allowed frontend origin
-const allowedOrigin = process.env.CORS_ORIGIN || "http://localhost:5173";
+const allowedOrigins = (process.env.CORS_ORIGINS || "http://localhost:5173")
+  .split(",")
+  .map(origin => origin.trim());
 
 // 🧱 Rate limiter
 const apiLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
+  windowMs: 60 * 60 * 1000,
   max: 500,
   message: "Too many requests from this IP, please try again after an hour!",
   standardHeaders: true,
@@ -46,17 +48,18 @@ const apiLimiter = rateLimit({
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || origin === allowedOrigin || origin.startsWith(allowedOrigin)) {
+      if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
       } else {
-        console.error(`Origin not allowed: ${origin} !== ${allowedOrigin}`);
-        return callback(new Error("Origin not allowed"));
+        console.error(`Origin not allowed: ${origin}`);
+        return callback(new Error("Origin not allowed by CORS"));
       }
     },
     methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true, // allows cookies/sessions
+    credentials: true,
   })
 );
+
 
 
 // 📦 Logging
