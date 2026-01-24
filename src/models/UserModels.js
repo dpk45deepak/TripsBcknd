@@ -123,14 +123,14 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-// Static method to verify credentials for local users
-userSchema.statics.findByCredentials = async function (email, password) {
-  const user = await this.findOne({ email, provider: 'local' });
-  if (!user) throw new Error('Invalid credentials');
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) throw new Error('Invalid credentials');
-  return user;
-};
+// // Static method to verify credentials for local users
+// userSchema.statics.findByCredentials = async function (email, password) {
+//   const user = await this.findOne({ email, provider: 'local' });
+//   if (!user) throw new Error('Invalid credentials');
+//   const isMatch = await bcrypt.compare(password, user.password);
+//   if (!isMatch) throw new Error('Invalid credentials');
+//   return user;
+// };
 
 const User = mongoose.model('User', userSchema);
 

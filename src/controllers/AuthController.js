@@ -91,6 +91,12 @@ export const loginUser = async (req, res) => {
             return res.status(401).json({ status: 441, msg: 'User not found, invalid credentials' });
         }
 
+        // 🔹 Check if user registered via Google OAuth
+        if (!user.password) {
+            return res.status(400).json({ msg: "Use Google to login" });
+        }
+
+
         // 🔹 Validate password
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
@@ -209,7 +215,7 @@ export const logOut = async (req, res) => {
             const user = await User.findById(decoded.userId);
             if (user) {
                 // Invalidate the stored refresh token in DB
-                user.tokens = null;
+                user.tokens = [];
                 await user.save();
             }
         } catch (err) {
@@ -237,21 +243,3 @@ export const logOut = async (req, res) => {
     }
 };
 
-
-// TODO: Add Social SignUp / Login controllers later
-// e.g., Google OAuth, Facebook Login, etc.
-
-
-export const googleCallback = (req, res) => {
-    const user = req.user;
-    res.status(200).json({
-        success: true,
-        message: "Google OAuth successful",
-    });
-};
-
-export const logoutUser = (req, res) => {
-    req.logout(() => {
-        res.status(200).json({ success: true, message: "Logged out successfully" });
-    });
-};
