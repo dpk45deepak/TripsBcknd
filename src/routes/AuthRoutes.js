@@ -55,7 +55,7 @@ router.get(
 
         // Ensure email is present
         if (!profile.emails || !profile.emails.length) {
-            return res.redirect(`${process.env.FRONTEND_URL}/login?error=no_email`);
+            return res.redirect(`${process.env.FRONTEND_URL}/signin?error=no_email`);
         }
 
         // Extract user info from profile
