@@ -100,7 +100,7 @@ app.get("/api", (req, res) => {
   res.json({ msg: "Backend running smoothly!! ✅ " });
 });
 
-app.get("/health", (req, res) => {
+app.get("/api/health", (req, res) => {
   res.status(200).send("OK");
 });
 
