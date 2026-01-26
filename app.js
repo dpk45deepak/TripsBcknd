@@ -32,9 +32,7 @@ const app = express();
 connectDB();
 
 // 🌐 Allowed frontend origin
-const allowedOrigins = (process.env.CORS_ORIGINS || "http://localhost:5173")
-  .split(",")
-  .map(origin => origin.trim());
+const allowedOrigins = process.env.CORS_ORIGINS || "http://localhost:5173";
 
 // 🧱 Rate limiter
 const apiLimiter = rateLimit({
